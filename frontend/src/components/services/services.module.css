@@ -1,0 +1,42 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.services {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.servicesH2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #1e3c72;
+}
+
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.serviceCard {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.serviceCardHover {
+    transform: translateY(-10px);
+}
+
+.serviceCardH3 {
+    color: #2a5298;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
