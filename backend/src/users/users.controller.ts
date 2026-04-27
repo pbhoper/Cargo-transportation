@@ -15,7 +15,7 @@ export class UsersController {
 
   @Post()
   @Roles(Role.Admin, Role.SysAdmin)
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity[]> {
   return this.usersService.create(createUserDto);
   }
 

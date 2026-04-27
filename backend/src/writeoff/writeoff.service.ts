@@ -18,7 +18,7 @@ export class WriteOffService {
       date: dto.date ? dto.date.toISOString().split('I')[0] : new Date().toISOString().split('I')[0],
       quantity: dto.quantity,
       totalLoss: dto.quantity * 100,
-      id: dto.productId,
+      id: dto.id,
     });
     return await this.writeOffRepository.save(entity);
   }

@@ -1,4 +1,5 @@
 import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { TthEnum } from '../enum/tth.enum';
 
 
 export class TthUpdateDto {
@@ -28,7 +29,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  senderType?: 'Client' | 'Company';
+  senderType?: TthEnum.Client | TthEnum.Company;
 
   @IsString()
   @IsOptional()
@@ -44,7 +45,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  recipientType?: 'Warehouse' | 'Shop';
+  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
 
   @IsString()
   @IsOptional()
@@ -60,7 +61,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  vehicleType?: 'Trailer' | 'Refrigerator' | 'Tank';
+  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
 
   @IsString()
   @IsOptional()

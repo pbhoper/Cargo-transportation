@@ -7,6 +7,18 @@ export class WarehouseDto {
   @IsNotEmpty()
   name: string;
 
+  @IsString()
+  @IsNotEmpty()
+  id: number;
+
+  @IsString()
+  @IsNotEmpty()
+  deletedAt: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  createdAt: Date;
+
   @ApiProperty({ description: 'Город, где находится склад' })
   @IsString()
   @IsNotEmpty()

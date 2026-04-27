@@ -17,7 +17,7 @@ export class UserEntity {
   middleName?: string;
 
   @Column({ type: 'date', nullable: true })
-  birthDate?: Date;
+  birthDate?: Date | null;
 
   @Column({ length: 100, type: 'varchar', unique: true, nullable: false })
   email: string;
@@ -42,10 +42,6 @@ export class UserEntity {
 
   @Column({ enum: Role, nullable: false })
   role: Role;
-
-  // delete
-  @Column({ type: 'uuid', nullable: true })
-  clientId: string;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;

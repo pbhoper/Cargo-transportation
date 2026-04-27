@@ -7,9 +7,21 @@ export class AuthDto {
 
   @IsString()
   @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
   phone: string;
 
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @IsString()
+  @IsOptional()
+  status?: string;
 }

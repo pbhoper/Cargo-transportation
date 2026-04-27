@@ -16,8 +16,8 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const { password, clientId, roleKeys, ...userData } = createUserDto;
+  async create(createUserDto: CreateUserDto): Promise<UserEntity[]> {
+    const { password, id, roleKeys, ...userData } = createUserDto;
 
     if (!roleKeys || roleKeys.length === 0) {
       throw new NotFoundException(
@@ -37,13 +37,12 @@ export class UsersService {
 
     delete userData.birthDate;
 
-    const user = this.usersRepository.create({
+    const user = this.usersRepository.create([{
       ...userData,
       birthDate,
       passwordHash: await bcrypt.hash(password, SALT_ROUNDS),
-      clientId: '...',
       isActive: true,
-    });
+    }]);
 
     await this.usersRepository.save(user);
 
@@ -72,10 +71,10 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
-    const user = await this.findOne(id);
+  async update(ide: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+    const user = await this.findOne(ide);
 
-      const { password, clientId, ...updateData } = updateUserDto;
+      const { password, id, ...updateData } = updateUserDto;
 
     Object.assign(user, updateData);
 

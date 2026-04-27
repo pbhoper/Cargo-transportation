@@ -4,9 +4,11 @@ import {
   IsArray,
   ValidateNested,
   IsDateString,
+  IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import {TthItemDto} from './tth.item-dto';
+import { TthEnum } from '../enum/tth.enum';
 
 export type TthStatus =
   'Completed'
@@ -16,10 +18,15 @@ export type TthStatus =
 
 export class CreateTthDto {
   @IsString()
+  @IsNotEmpty()
+  id: number;
+
+  @IsString()
   @IsOptional()
   number?: string;
 
   @IsDateString()
+  @IsNotEmpty()
   dateCreated: string;
 
   @IsString()
@@ -27,9 +34,11 @@ export class CreateTthDto {
   notes?: string;
 
   @IsString()
+  @IsNotEmpty()
   senderName: string;
 
   @IsString()
+  @IsNotEmpty()
   senderId: string;
 
   @IsString()
@@ -38,7 +47,7 @@ export class CreateTthDto {
 
   @IsString()
   @IsOptional()
-  senderType?: 'Client' | 'Company';
+  senderType?: TthEnum.Client | TthEnum.Company;
 
   @IsString()
   recipientId: string;
@@ -52,32 +61,40 @@ export class CreateTthDto {
 
   @IsString()
   @IsOptional()
-  recipientType?: 'Warehouse' | 'Shop';
+  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
 
   @IsString()
+  @IsNotEmpty()
   vehicleId: string;
 
   @IsString()
+  @IsNotEmpty()
   vehicleBrandModel: string;
 
   @IsString()
+  @IsNotEmpty()
   vehicleLicensePlate: string;
 
   @IsString()
   @IsOptional()
-  vehicleType?: 'Trailer' | 'Refrigerator' | 'Tank';
+  @IsNotEmpty()
+  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
 
   @IsString()
+  @IsNotEmpty()
   driverId: string;
 
   @IsString()
+  @IsNotEmpty()
   driverFullName: string;
 
   @IsString()
+  @IsNotEmpty()
   driverPassport: string;
 
   @IsString()
   @IsOptional()
+  @IsNotEmpty()
   driverPhone?: string;
 
   @IsArray()

@@ -5,7 +5,7 @@ export class WriteoffCreateDto {
   @ApiProperty({ description: 'ID товара, который списан' })
   @IsNumber()
   @IsNotEmpty()
-  productId: number;
+  id: number;
 
   @ApiProperty({
     description: 'Количество списанного товара',
@@ -21,4 +21,8 @@ export class WriteoffCreateDto {
   @IsOptional()
   @IsDate()
   date?: Date;
+
+  @IsNumber()
+  @IsNotEmpty()
+  totalLoss: number;
 }

@@ -11,9 +11,16 @@ export class GoodsDto {
   @IsString()
   name: string;
 
+  @IsString()
+  id: number;
+
+  @IsString()
+  createdAt: Date;
+
   @IsNumber()
   @IsPositive()
   quantity: number;
+
   @IsNumber()
   @IsPositive()
   price: number;

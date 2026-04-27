@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { TthItemDto } from '../dto/tth.item-dto';
+import {TthEnum} from '../enum/tth.enum';
 
 @Entity('Tth')
 export class TthEntity {
@@ -25,7 +26,7 @@ export class TthEntity {
   senderAddress?: string;
 
   @Column({ nullable: true })
-  senderType?: 'Client' | 'Company';
+  senderType?: TthEnum.Client | TthEnum.Company;
 
   @Column()
   recipientId: string;
@@ -37,7 +38,7 @@ export class TthEntity {
   recipientAddress?: string;
 
   @Column({ nullable: true })
-  recipientType?: 'Warehouse' | 'Shop';
+  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
 
   @Column()
   vehicleId: string;
@@ -49,7 +50,7 @@ export class TthEntity {
   vehicleLicensePlate: string;
 
   @Column({ nullable: true })
-  vehicleType?: 'Trailer' | 'Refrigerator' | 'Tank';
+  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
 
   @Column()
   driverId: string;

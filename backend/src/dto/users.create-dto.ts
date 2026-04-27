@@ -1,17 +1,24 @@
 import { IsString, IsEmail, IsNotEmpty, IsOptional, IsDate, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '../enum/roles.enum';
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  id: number;
+
   @ApiProperty({
     description: 'Имя',
-    example: 'Андрей' })
+    example: 'Андрей',
+  })
   @IsString()
   @IsNotEmpty()
   firstName: string;
 
   @ApiProperty({
     description: 'Фамилия',
-    example: 'Андреев' })
+    example: 'Андреев',
+  })
   @IsString()
   @IsNotEmpty()
   lastName: string;
@@ -36,61 +43,64 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'Email',
-    example: 'asdf@asdf.com' })
+    example: 'asdf@asdf.com',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
   @ApiProperty({
     description: 'Город',
-    example: 'Минск', required: false })
+    example: 'Минск',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   city?: string;
 
   @ApiProperty({
     description: 'Улица',
-    example: 'Советская', required: false })
+    example: 'Советская',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   street?: string;
 
   @ApiProperty({
     description: 'Дом',
-    example: '15', required: false })
+    example: '15',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   house?: string;
 
   @ApiProperty({
     description: 'Квартира',
-    example: '23', required: false })
+    example: '23',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   apartment?: string;
 
   @ApiProperty({
     description: 'Login',
-    example: 'andrey123.com' })
+    example: 'andrey123.com',
+  })
   @IsString()
   @IsNotEmpty()
   login: string;
 
   @ApiProperty({
     description: 'Пароль',
-    example: 'sadf2134' })
+    example: 'sadf2134',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
   password: string;
-
-  @ApiProperty({
-    description: 'ID клиента-перевозчика',
-    example: 'asdf1234',
-  })
-  @IsString()
-  @IsNotEmpty()
-  clientId: string;
 
   @ApiProperty({
     description: 'Ключи ролей',
@@ -99,4 +109,16 @@ export class CreateUserDto {
   @IsString({ each: true })
   @IsNotEmpty()
   roleKeys: string[];
+
+  @IsString()
+  @IsNotEmpty()
+  passwordHash: string;
+
+  @IsString()
+  @IsNotEmpty()
+  role: Role;
+
+  @IsString()
+  @IsNotEmpty()
+  isActive: boolean;
 }
