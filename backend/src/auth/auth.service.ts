@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthEntity } from '../entity/auth.entity';
 import { AuthDto } from '../dto/auth-dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,11 @@ export class AuthService {
       );
     }
 
-    const client = this.clientRepository.create(authDto);
+    const entityData: Partial<AuthEntity> = plainToInstance(
+      AuthEntity,
+      authDto,
+    );
+    const client = this.clientRepository.create(entityData);
     return this.clientRepository.save(client);
   }
 

@@ -27,7 +27,7 @@ export class UsersService {
 
     for (const key of roleKeys) {
       if (!Object.values(userData).includes(key as Role)) {
-        throw new NotFoundException(`Недействительная ключ роли: ${key}`);
+        throw new NotFoundException(`Недействительный ключ роли: ${key}`);
       }
     }
 
