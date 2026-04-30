@@ -1,35 +1,33 @@
 import styles from './header.module.css'
-import {Button, Checkbox, Flex, Form, type FormProps, Input, Modal} from "antd";
+import { Button, Flex, Modal, Segmented } from "antd";
 import { useState } from 'react';
+import LoginForm from "../../forms/login.form.tsx";
+import RegisterForm from "../../forms/register.form.tsx";
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
-};
+type Segment = "login" | "register";
+
+const options = [{label: "ВОЙТИ", value:  "login"}, {label: "ЗАРЕГИСТРИРОВАТЬСЯ", value:  "register"}];
 
 export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [segment, setSegment] = useState("login");
+  console.log("segment", segment);
+
+  const handleChangeSegment = (value: Segment) => {
+    if (!value) {
+      return;
+    }
+    setSegment(value);
+  }
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const cancelModal = () => {
     setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
-  const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-  };
-
-  const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
   return (
     <header>
       <div className={styles.container}>
@@ -39,6 +37,7 @@ export const Header = () => {
             <li><a href="#main">Главная</a></li>
             <li><a href="#services">Услуги</a></li>
             <li><a href="#contacts">Контакты</a></li>
+
             <Flex justify="flex-end" align="flex-start" style={{ width: '100%' }}>
               <Button type="primary" onClick={showModal}>Вход</Button>
             </Flex>
@@ -46,45 +45,12 @@ export const Header = () => {
               title="Basic Modal"
               closable={{ 'aria-label': 'Custom Close Button' }}
               open={isModalOpen}
-              onOk={handleOk}
-              onCancel={handleCancel}
+              footer={false}
+              width="400px"
+              onCancel={cancelModal}
             >
-              <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
-              >
-                <Form.Item<FieldType>
-                  label="Username"
-                  name="username"
-                  rules={[{ required: true, message: 'Please input your username!' }]}
-                >
-                  <Input />
-                </Form.Item>
-
-                <Form.Item<FieldType>
-                  label="Password"
-                  name="password"
-                  rules={[{ required: true, message: 'Please input your password!' }]}
-                >
-                  <Input.Password />
-                </Form.Item>
-
-                <Form.Item<FieldType> name="remember" valuePropName="checked" label={null}>
-                  <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-
-                <Form.Item label={null}>
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                  </Button>
-                </Form.Item>
-              </Form>
+              <Segmented options={options} block onChange={(value)=> handleChangeSegment(value as Segment)}></Segmented>
+              {segment === "login" ? <LoginForm/> : <RegisterForm/>}
             </Modal>
           </ul>
         </nav>
