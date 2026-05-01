@@ -4,7 +4,7 @@ import type {RegisterTypes} from "../interfaces/register.interface.ts";
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: "http://localhost:3000/api/",
+  baseURL: "http://localhost:3000/",
   params: {},
   withCredentials: true
 })
