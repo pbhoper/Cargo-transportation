@@ -3,20 +3,22 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('clients')
 export class AuthEntity {
   @PrimaryGeneratedColumn()
-  id: number;
 
   @Column({ unique: true })
-  name: string;
+  username: string;
 
   @Column()
   email: string;
 
   @Column({ nullable: true })
-  phone: string;
+  password: string;
 
   @Column()
-  address: string;
+  passwordRepeat: string;
 
-  @Column({ default: 'NEW' })
-  status: string;
+  @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
 }

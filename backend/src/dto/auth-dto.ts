@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 export class AuthDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  username: string;
 
   @IsString()
   @IsNotEmpty()
@@ -11,17 +11,17 @@ export class AuthDto {
 
   @IsString()
   @IsNotEmpty()
-  phone: string;
+  password: string;
 
   @IsString()
   @IsOptional()
-  address?: string;
+  passwordRepeat: string;
 
   @IsString()
   @IsNotEmpty()
-  id: string;
+  firstName: string;
 
   @IsString()
   @IsOptional()
-  status?: string;
+  lastName: string;
 }

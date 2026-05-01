@@ -11,8 +11,7 @@ export class AuthService {
     @InjectRepository(AuthEntity)
     private clientRepository: Repository<AuthEntity>,) {}
 
-  async createClient(
-    authDto: AuthDto, role: string,): Promise<AuthEntity> {
+  async createClient(authDto: AuthDto, role: string,): Promise<AuthEntity> {
 
     if (role !== 'sysadmin') {
       throw new ForbiddenException(
@@ -20,11 +19,10 @@ export class AuthService {
       );
     }
 
-    const entityData: Partial<AuthEntity> = plainToInstance(
-      AuthEntity,
-      authDto,
-    );
+    const entityData: Partial<AuthEntity> = plainToInstance(AuthEntity, authDto,);
+
     const client = this.clientRepository.create(entityData);
+
     return this.clientRepository.save(client);
   }
 

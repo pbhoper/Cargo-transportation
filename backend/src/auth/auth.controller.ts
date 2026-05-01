@@ -5,7 +5,7 @@ import { Roles } from '../decorator/roles.decorator';
 import { RolesGuard } from '../guard/roles.guard';
 import { Role } from '../enum/roles.enum';
 
-@Controller('sysadmin/clients')
+@Controller('api/auth/register')
 @UseGuards(RolesGuard)
 export class AuthController {
   constructor(private readonly sysAdminService: AuthService) {}

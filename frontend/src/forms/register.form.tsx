@@ -1,22 +1,32 @@
 import {Button, Flex, Form, type FormProps, Input} from "antd";
 import type {FC, JSX} from "react";
 import type {RegisterTypes} from "../interfaces/register.interface.ts";
+import axios from "axios";
+
+const http = axios.create({
+  baseURL: "http://localhost:3000/api/",
+  params: {},
+  withCredentials: true
+})
 
 const RegisterForm: FC = (): JSX.Element => {
-
-  const handleFinish: FormProps<RegisterTypes>['onFinish'] = (values) => {
+  const handleFinish: FormProps<RegisterTypes>['onFinish'] = async (values) => {
     console.log('Success:', values);
+
+    try {
+      const data = await http.post("http://localhost:3000/auth/register", values);
+      console.log('data:', data);
+    } catch (error) {
+      console.log('error:', error);
+    }
+
   };
 
-  const handleFinishFailed: FormProps<RegisterTypes>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
 
   return (
     <Form
       name="register"
       onFinish={handleFinish}
-      onFinishFailed={handleFinishFailed}
       autoComplete="off"
       style={{margin: '20px 0 10px 0'}}
     >

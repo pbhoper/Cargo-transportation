@@ -1,17 +1,14 @@
 import styles from './header.module.css'
-import { Button, Flex, Modal, Segmented } from "antd";
+import { Button, Flex,} from "antd";
 import { useState } from 'react';
-import LoginForm from "../../forms/login.form.tsx";
-import RegisterForm from "../../forms/register.form.tsx";
+import AuthPage from "../../pages/auth-page.tsx";
+
 
 type Segment = "login" | "register";
 
-const options = [{label: "ВОЙТИ", value:  "login"}, {label: "ЗАРЕГИСТРИРОВАТЬСЯ", value:  "register"}];
-
 export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [segment, setSegment] = useState("login");
-  console.log("segment", segment);
+  const [segment, setSegment] = useState<Segment>("login");
 
   const handleChangeSegment = (value: Segment) => {
     if (!value) {
@@ -37,21 +34,10 @@ export const Header = () => {
             <li><a href="#main">Главная</a></li>
             <li><a href="#services">Услуги</a></li>
             <li><a href="#contacts">Контакты</a></li>
-
             <Flex justify="flex-end" align="flex-start" style={{ width: '100%' }}>
               <Button type="primary" onClick={showModal}>Вход</Button>
             </Flex>
-            <Modal
-              title="Basic Modal"
-              closable={{ 'aria-label': 'Custom Close Button' }}
-              open={isModalOpen}
-              footer={false}
-              width="400px"
-              onCancel={cancelModal}
-            >
-              <Segmented options={options} block onChange={(value)=> handleChangeSegment(value as Segment)}></Segmented>
-              {segment === "login" ? <LoginForm/> : <RegisterForm/>}
-            </Modal>
+            <AuthPage segment={segment} isModalOpen={isModalOpen} cancelModal={cancelModal} onChangeSegment={handleChangeSegment}/>
           </ul>
         </nav>
       </div>
