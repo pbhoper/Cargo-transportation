@@ -5,7 +5,7 @@ import { Roles } from '../decorator/roles.decorator';
 import { RolesGuard } from '../guard/roles.guard';
 import { Role } from '../enum/roles.enum';
 
-@Controller('api/auth/register')
+@Controller('auth')
 @UseGuards(RolesGuard)
 export class AuthController {
   constructor(private readonly sysAdminService: AuthService) {}
@@ -14,6 +14,18 @@ export class AuthController {
   // @Roles(Role.SysAdmin)
   create(@Body() createClientDto: AuthDto) {
     return this.sysAdminService.createClient(createClientDto, Role.SysAdmin);
+  }
+
+  @Post('register')
+  register(@Body() registerClientDto: AuthDto) {
+    console.log('register', registerClientDto);
+    return 'register';
+  }
+
+  @Post('login')
+  login(@Body() loginClientDto: AuthDto) {
+    console.log('login', loginClientDto);
+    return 'login';
   }
 
   @Get()

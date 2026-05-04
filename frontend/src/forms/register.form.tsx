@@ -1,7 +1,7 @@
-import {Button, Flex, Form, type FormProps, Input} from "antd";
+import {Button, Flex, Form, type FormProps, Input, notification} from "antd";
 import type {FC, JSX} from "react";
 import type {RegisterTypes} from "../interfaces/register.interface.ts";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const http = axios.create({
   baseURL: "http://localhost:3000/",
@@ -14,12 +14,27 @@ const RegisterForm: FC = (): JSX.Element => {
     console.log('Success:', values);
 
     try {
-      const data = await http.post("http://localhost:3000/auth/register", values);
-      console.log('data:', data);
-    } catch (error) {
-      console.log('error:', error);
-    }
+      const {data} = await http.post("auth/register", values);
+      console.log('data', data);
+    } catch (error: unknown) {
+      let errorMessage = "Неизвестная ошибка";
 
+      if (error instanceof AxiosError) {
+        const responseErrorMessage = error.response?.data.message;
+
+        if (responseErrorMessage) {
+          errorMessage = (responseErrorMessage)
+            ? responseErrorMessage.join(", ")
+            : [responseErrorMessage];
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+      }
+      notification.error({
+        message: "Ошибка регистрации",
+        description: errorMessage
+      })
+    }
   };
 
 
