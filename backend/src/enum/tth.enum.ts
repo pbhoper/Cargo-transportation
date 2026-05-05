@@ -9,7 +9,7 @@ export enum TthEnum {
   Warehouse = 'WAREHOUSE',
   Shop = 'SHOP',
 
-  Trailer = 'TRAILER',
-  Refrigerator = 'REFRIGERATOR',
-  Tank = 'Tank',
+  Minibus = 'MINIBUS',
+  FurnitureVan = 'FURNITUREVAN',
+  Truck = 'TRUCK',
 }

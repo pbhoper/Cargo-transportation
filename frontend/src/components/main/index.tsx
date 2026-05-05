@@ -7,6 +7,7 @@ interface FormData {
   toAddress: string;
   phone: string;
   email: string;
+  vehicleType: string;
 }
 
 export const Main = () => {
@@ -17,6 +18,7 @@ export const Main = () => {
     toAddress: '',
     phone: '',
     email: '',
+    vehicleType: '',
   });
 
   const openModal = () => setModalOpen(true);
@@ -29,11 +31,12 @@ export const Main = () => {
       fromAddress: '',
       toAddress: '',
       phone: '',
-      email: ''
+      email: '',
+      vehicleType: '',
     });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const {name, value} = e.target;
     setFormData(prev => ({...prev, [name as keyof FormData]: value}));
   };
@@ -94,6 +97,22 @@ export const Main = () => {
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
             <h3>Заказать перевозку</h3>
             <form onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="vehicleType">Тип транспорта:</label>
+                <select
+                  id="vehicleType"
+                  name="vehicleType"
+                  value={formData.vehicleType}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Выберите тип</option>
+                  <option value="microbus">Микроавтобус</option>
+                  <option value="truck">Грузовик</option>
+                  <option value="van">Грузовичок (1.5 т)</option>
+                  <option value="semiTrailer">Полуприцеп (20 т)</option>
+                </select>
+              </div>
               <div>
                 <label htmlFor="fullName">ФИО:</label>
                 <input

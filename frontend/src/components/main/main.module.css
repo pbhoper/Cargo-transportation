@@ -263,3 +263,27 @@ footer {
     color: white;
 }
 
+.vehicleButton {
+    padding: 8px 12px;
+    background: #005cbf;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.vehicleOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.vehicleOption {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f8f9fa;
+    text-align: left;
+    cursor: pointer;
+}

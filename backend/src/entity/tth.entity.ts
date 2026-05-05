@@ -50,7 +50,7 @@ export class TthEntity {
   vehicleLicensePlate: string;
 
   @Column({ nullable: true })
-  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
+  vehicleType?: TthEnum.Minibus | TthEnum.FurnitureVan | TthEnum.Truck;
 
   @Column()
   driverId: string;
