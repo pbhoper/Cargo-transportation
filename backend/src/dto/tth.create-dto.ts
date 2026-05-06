@@ -47,7 +47,7 @@ export class CreateTthDto {
 
   @IsString()
   @IsOptional()
-  senderType?: TthEnum.Client | TthEnum.Company;
+  senderType?: TthEnum
 
   @IsString()
   recipientId: string;
@@ -61,7 +61,7 @@ export class CreateTthDto {
 
   @IsString()
   @IsOptional()
-  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
+  recipientType?: TthEnum
 
   @IsString()
   @IsNotEmpty()
@@ -78,7 +78,7 @@ export class CreateTthDto {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
-  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
+  vehicleType?: TthEnum
 
   @IsString()
   @IsNotEmpty()

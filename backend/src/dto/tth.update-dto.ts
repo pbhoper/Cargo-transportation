@@ -29,7 +29,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  senderType?: TthEnum.Client | TthEnum.Company;
+  senderType?: TthEnum
 
   @IsString()
   @IsOptional()
@@ -45,7 +45,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
+  recipientType?: TthEnum
 
   @IsString()
   @IsOptional()
@@ -61,7 +61,7 @@ export class TthUpdateDto {
 
   @IsString()
   @IsOptional()
-  vehicleType?: TthEnum.Trailer | TthEnum.Refrigerator | TthEnum.Tank;
+  vehicleType?: TthEnum
 
   @IsString()
   @IsOptional()

@@ -34,6 +34,7 @@ export const Header = () => {
             <li><a href="#main">Главная</a></li>
             <li><a href="#services">Услуги</a></li>
             <li><a href="#contacts">Контакты</a></li>
+            <li><a href="#warehouses">Склады</a></li>
             <Flex justify="flex-end" align="flex-start" style={{ width: '100%' }}>
               <Button type="primary" onClick={showModal}>Вход</Button>
             </Flex>

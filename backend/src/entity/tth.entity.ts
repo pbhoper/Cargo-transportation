@@ -26,7 +26,7 @@ export class TthEntity {
   senderAddress?: string;
 
   @Column({ nullable: true })
-  senderType?: TthEnum.Client | TthEnum.Company;
+  senderType?: TthEnum
 
   @Column()
   recipientId: string;
@@ -38,7 +38,7 @@ export class TthEntity {
   recipientAddress?: string;
 
   @Column({ nullable: true })
-  recipientType?: TthEnum.Warehouse | TthEnum.Shop;
+  recipientType?: TthEnum
 
   @Column()
   vehicleId: string;
@@ -50,7 +50,7 @@ export class TthEntity {
   vehicleLicensePlate: string;
 
   @Column({ nullable: true })
-  vehicleType?: TthEnum.Minibus | TthEnum.FurnitureVan | TthEnum.Truck;
+  vehicleType?: TthEnum
 
   @Column()
   driverId: string;
