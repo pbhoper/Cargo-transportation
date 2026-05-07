@@ -6,5 +6,6 @@ export const Route = createFileRoute('/')({
 })
 
 function RouteComponent() { //eslint-disable-line
-  return <Main />
+  return( <Main />
+  )
 }
