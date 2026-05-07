@@ -21,9 +21,7 @@ export class AuthService {
 
     const entityData: Partial<AuthEntity> = plainToInstance(AuthEntity, authDto,);
 
-    const client = this.clientRepository.create(entityData);
-
-    return this.clientRepository.save(client);
+    return this.clientRepository.save(entityData);
   }
 
   async findAllClients(): Promise<AuthEntity[]> {

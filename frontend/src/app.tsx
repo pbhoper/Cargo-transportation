@@ -1,17 +1,8 @@
-import {Header} from "./components/header";
-import {Footer} from "./components/footer";
-import {Main} from "./components/main";
-
-
+import { router } from "./router";
+import { RouterProvider } from "@tanstack/react-router";
 
 function App() {
-  return (
-    <>
-      <Header />
-      <Main />
-      <Footer />
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
