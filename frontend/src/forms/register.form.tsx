@@ -9,13 +9,18 @@ const http = axios.create({
   withCredentials: true
 })
 
-const RegisterForm: FC = (): JSX.Element => {
+interface Props {
+  onSuccess: () => void;
+}
+
+const RegisterForm: FC<Props> = ({ onSuccess }): JSX.Element => {
   const handleFinish: FormProps<RegisterTypes>['onFinish'] = async (values) => {
     console.log('Success:', values);
 
     try {
       const {data} = await http.post("auth/register", values);
       console.log('data', data);
+      onSuccess();
     } catch (error: unknown) {
       let errorMessage = "Неизвестная ошибка";
 

@@ -1,10 +1,17 @@
 import {Button, Flex, Form, type FormProps, Input} from "antd";
 import type {FC, JSX} from "react";
 import type {LoginTypes} from "../interfaces/login.interface.ts";
-const LoginForm: FC = (): JSX.Element => {
+
+
+interface Props {
+  onSuccess: () => void;
+}
+
+const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
 
   const handleFinish: FormProps<LoginTypes>['onFinish'] = (values) => {
     console.log('Success:', values);
+    onSuccess();
   };
 
   const handleFinishFailed: FormProps<LoginTypes>['onFinishFailed'] = (errorInfo) => {

@@ -19,13 +19,11 @@ export class AuthController {
   @Post('register')
   register(@Body() registerClientDto: AuthDto) {
     console.log('register', registerClientDto);
-    return 'register';
   }
 
   @Post('login')
   login(@Body() loginClientDto: AuthDto) {
     console.log('login', loginClientDto);
-    return 'login';
   }
 
   @Get()
