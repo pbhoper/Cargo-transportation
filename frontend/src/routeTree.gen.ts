@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WarehouseRouteImport } from './routes/warehouse'
+import { Route as TthRouteImport } from './routes/tth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TravelSheetsRouteImport } from './routes/travel.sheets'
 
 const WarehouseRoute = WarehouseRouteImport.update({
   id: '/warehouse',
   path: '/warehouse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TthRoute = TthRouteImport.update({
+  id: '/tth',
+  path: '/tth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,31 +29,44 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TravelSheetsRoute = TravelSheetsRouteImport.update({
+  id: '/travel/sheets',
+  path: '/travel/sheets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
+  '/travel/sheets': typeof TravelSheetsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
+  '/travel/sheets': typeof TravelSheetsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
+  '/travel/sheets': typeof TravelSheetsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/warehouse'
+  fullPaths: '/' | '/tth' | '/warehouse' | '/travel/sheets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/warehouse'
-  id: '__root__' | '/' | '/warehouse'
+  to: '/' | '/tth' | '/warehouse' | '/travel/sheets'
+  id: '__root__' | '/' | '/tth' | '/warehouse' | '/travel/sheets'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  TthRoute: typeof TthRoute
   WarehouseRoute: typeof WarehouseRoute
+  TravelSheetsRoute: typeof TravelSheetsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarehouseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tth': {
+      id: '/tth'
+      path: '/tth'
+      fullPath: '/tth'
+      preLoaderRoute: typeof TthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/travel/sheets': {
+      id: '/travel/sheets'
+      path: '/travel/sheets'
+      fullPath: '/travel/sheets'
+      preLoaderRoute: typeof TravelSheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  TthRoute: TthRoute,
   WarehouseRoute: WarehouseRoute,
+  TravelSheetsRoute: TravelSheetsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
