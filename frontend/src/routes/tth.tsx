@@ -40,24 +40,7 @@ function RouteComponent() {  //eslint-disable-line
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const [tthList, setTthList] = useState<TTH[]>([
-    {
-      id: 1,
-      number: "ТТН-001",
-      date: currentDate,
-      sender: "Склад Алматы",
-      receiver: "Магазин Астана",
-      status: "Оформлен",
-      products: [
-        {
-          id: 1,
-          name: "Ноутбук",
-          quantity: 2,
-          price: 250000,
-        },
-      ],
-    },
-  ]);
+  const [tthList, setTthList] = useState<TTH[]>([]);
 
   const [form, setForm] = useState<TTH>(emptyForm);
 
