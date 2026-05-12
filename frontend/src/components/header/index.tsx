@@ -78,6 +78,7 @@ export const Header = () => {
         <nav className={styles.nav}>
           <ul className={styles.menu}>
             <li><a href="/">Главная</a></li>
+            <li><a href="/reports">Отчеты</a></li>
             <li><a href="/tth">ТТН</a></li>
             <li><a href="/travel/sheets">Путевые листы</a></li>
             <li><a href="/warehouse">Склады</a></li>

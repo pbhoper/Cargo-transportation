@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WarehouseRouteImport } from './routes/warehouse'
 import { Route as TthRouteImport } from './routes/tth'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TravelSheetsRouteImport } from './routes/travel.sheets'
 
@@ -22,6 +23,11 @@ const WarehouseRoute = WarehouseRouteImport.update({
 const TthRoute = TthRouteImport.update({
   id: '/tth',
   path: '/tth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const TravelSheetsRoute = TravelSheetsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/travel/sheets': typeof TravelSheetsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/travel/sheets': typeof TravelSheetsRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/travel/sheets': typeof TravelSheetsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tth' | '/warehouse' | '/travel/sheets'
+  fullPaths: '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tth' | '/warehouse' | '/travel/sheets'
-  id: '__root__' | '/' | '/tth' | '/warehouse' | '/travel/sheets'
+  to: '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
+  id: '__root__' | '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReportsRoute: typeof ReportsRoute
   TthRoute: typeof TthRoute
   WarehouseRoute: typeof WarehouseRoute
   TravelSheetsRoute: typeof TravelSheetsRoute
@@ -85,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReportsRoute: ReportsRoute,
   TthRoute: TthRoute,
   WarehouseRoute: WarehouseRoute,
   TravelSheetsRoute: TravelSheetsRoute,
