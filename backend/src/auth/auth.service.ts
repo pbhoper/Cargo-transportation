@@ -1,30 +1,68 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { Injectable, ForbiddenException, UnauthorizedException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthEntity } from '../entity/auth.entity';
 import { AuthDto } from '../dto/auth-dto';
-import { plainToInstance } from 'class-transformer';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(AuthEntity)
-    private clientRepository: Repository<AuthEntity>,) {}
+    private clientRepository: Repository<AuthEntity>,
+    private jwtService: JwtService,
+  ) {}
 
-  async createClient(authDto: AuthDto, role: string,): Promise<AuthEntity> {
+  async register(authDto: AuthDto) {
+    const candidate = await this.clientRepository.findOne({
+      where: {
+        email: authDto.email,
+      },
+    });
 
-    if (role !== 'sysadmin') {
-      throw new ForbiddenException(
-        'Только СисАдмин может производить регистрацию',
-      );
+    if (candidate) {
+      throw new ForbiddenException('Пользователь уже существует');
     }
 
-    const entityData: Partial<AuthEntity> = plainToInstance(AuthEntity, authDto,);
+    const hashedPassword = await bcrypt.hash(authDto.password, 5);
 
-    return this.clientRepository.save(entityData);
+    const user = this.clientRepository.create({
+      ...authDto,
+      password: hashedPassword,
+    });
+
+    return this.clientRepository.save(user);
   }
 
-  async findAllClients(): Promise<AuthEntity[]> {
-    return this.clientRepository.find();
+  async login(authDto: AuthDto) {
+    const user = await this.clientRepository.findOne({
+      where: {
+        email: authDto.email,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Неверный логин');
+    }
+
+    const passwordEquals = await bcrypt.compare(
+      authDto.password,
+      user.password,
+    );
+
+    if (!passwordEquals) {
+      throw new UnauthorizedException('Неверный пароль');
+    }
+
+    const payload = {
+      id: user.id,
+      email: user.email,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user,
+    };
   }
 }
