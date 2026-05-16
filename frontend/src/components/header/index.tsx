@@ -5,10 +5,10 @@ import {
   type MenuProps,
   Space,
 } from "antd";
-
 import { useState } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
 import AuthPage from "../../pages/auth-page.tsx";
+import {useAuth} from "../../forms/authcontext.tsx";
 
 type Segment = "login" | "register";
 
@@ -20,7 +20,7 @@ export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [segment, setSegment] = useState<Segment>("login");
 
-  const [isAuth, setIsAuth] = useState(false);
+  const { isAuth, logout } = useAuth();
 
   const items: MenuProps['items'] = [
     {
@@ -48,7 +48,7 @@ export const Header = () => {
       key: '5',
       danger: true,
       label: 'Logout',
-      onClick: () => setIsAuth(false),
+      onClick: () => logout(),
     },
   ];
 
@@ -66,7 +66,6 @@ export const Header = () => {
   };
 
   const handleLoginSuccess = () => {
-    setIsAuth(true);
     setIsModalOpen(false);
   };
 
@@ -78,10 +77,16 @@ export const Header = () => {
         <nav className={styles.nav}>
           <ul className={styles.menu}>
             <li><a href="/">Главная</a></li>
-            <li><a href="/reports">Отчеты</a></li>
-            <li><a href="/tth">ТТН</a></li>
-            <li><a href="/travel/sheets">Путевые листы</a></li>
-            <li><a href="/warehouse">Склады</a></li>
+
+            {isAuth && (
+              <>
+                <li><a href="/reports">Отчеты</a></li>
+                <li><a href="/tth">ТТН</a></li>
+                <li><a href="/travel/sheets">Путевые листы</a></li>
+                <li><a href="/warehouse">Склады</a></li>
+              </>
+            )}
+
             <li><a href="#services">Услуги</a></li>
             <li><a href="#contacts">Контакты</a></li>
           </ul>

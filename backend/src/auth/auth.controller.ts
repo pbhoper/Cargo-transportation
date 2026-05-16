@@ -1,10 +1,8 @@
-import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from '../dto/auth-dto';
-import { RolesGuard } from '../guard/roles.guard';
 
 @Controller('auth')
-@UseGuards(RolesGuard)
 export class AuthController {
   constructor(private readonly sysAdminService: AuthService) {}
 
