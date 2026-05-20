@@ -142,7 +142,7 @@ function RouteComponent() { //eslint-disable-line
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.title}>📦 ТТН система</h1>
+        <h1 style={styles.title}>ТТН система</h1>
 
         <div style={styles.filters}>
           <input

@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-
 import {getWarehouses, createWarehouse} from "../api/warehouse.ts";
 
 export const Route = createFileRoute("/warehouse")({ //eslint-disable-line

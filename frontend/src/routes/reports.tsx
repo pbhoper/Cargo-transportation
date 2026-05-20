@@ -41,10 +41,7 @@ const reportOptions = [
 function RouteComponent() { //eslint-disable-line
   const [loading, setLoading] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('waybill');
-
-  const [dates, setDates] =
-    useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
-
+  const [dates, setDates] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [clientId, setClientId] = useState('');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -101,7 +98,6 @@ function RouteComponent() { //eslint-disable-line
       setLoading(true);
 
       const [start, end] = dates;
-
       const startDate = start.format('YYYY-MM-DD');
       const endDate = end.format('YYYY-MM-DD');
 
@@ -128,10 +124,8 @@ function RouteComponent() { //eslint-disable-line
 
       link.href = url;
       link.download = `${reportType}-report.xlsx`;
-
       document.body.appendChild(link);
       link.click();
-
       link.remove();
       window.URL.revokeObjectURL(url);
 

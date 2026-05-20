@@ -31,7 +31,7 @@ export class ReportService {
 
   private async finalizeResponse(workbook: ExcelJS.Workbook, res: Response, name: string) {
     res.setHeader('Content-Type', 'document');
-    res.setHeader('Content-Disposition', `attachment; filename=${name}.xlsx`); //создать xlsx файл
+    res.setHeader('Content-Disposition', `attachment; filename=${name}.xlsx`);
     await workbook.xlsx.write(res);
     res.end();
   }

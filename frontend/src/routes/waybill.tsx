@@ -65,7 +65,6 @@ function RouteComponent() { //eslint-disable-line
     await fetch(`${API}/${id}`, {
       method: "DELETE",
     });
-
     load();
   };
 
