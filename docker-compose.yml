@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    container_name: cargo-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+    networks:
+      - cargo-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    container_name: cargo-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - cargo-net
+
+  db:
+    image: postgres:16
+    container_name: cargo-db
+    restart: always
+    environment:
+      POSTGRES_USER: cargo
+      POSTGRES_PASSWORD: cargo123
+      POSTGRES_DB: cargo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - cargo-net
+
+volumes:
+  pg_data:
+
+networks:
+  cargo-net:
+    driver: bridge
