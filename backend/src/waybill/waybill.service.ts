@@ -1,56 +1,40 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WaybillEntity } from '../entity/waybill.entity';
 import { Repository } from 'typeorm';
-import {WaybillDto} from '../dto/waybill-dto';
-import {WaybillUpdatedDto} from '../dto/waybill.updated-dto';
-
+import { WaybillEntity } from '../entity/waybill.entity';
+import { WaybillDto} from '../dto/waybill-dto';
+import { WaybillUpdatedDto } from '../dto/waybill.updated-dto';
 
 @Injectable()
 export class WaybillService {
   constructor(
     @InjectRepository(WaybillEntity)
-    private waybillRepository: Repository<WaybillEntity>,
+    private readonly repo: Repository<WaybillEntity>,
   ) {}
 
-  async create(WaybillDto: Partial<WaybillDto>): Promise<WaybillEntity> {
-    const waybill = this.waybillRepository.create(WaybillDto);
-    return await this.waybillRepository.save(waybill);
+  create(dto: WaybillDto) {
+    const entity = this.repo.create(dto);
+    return this.repo.save(entity);
   }
 
-  async findOne(id: number): Promise<WaybillEntity> {
-    const waybill = await this.waybillRepository.findOneBy({ id });
-    if (!waybill) {
-      throw new NotFoundException(`Путевой лист с  N${id} не найден`);
-    }
-    return waybill;
+  findAll() {
+    return this.repo.find({ order: { id: 'DESC' } });
   }
 
-  async findAll(): Promise<WaybillEntity[]> {
-    const waybills = await this.waybillRepository.find({
-      order: { id: 'DESC' },
-    });
-    if (!waybills) {
-      throw new NotFoundException(`Путевых листов еще нет`);
-    }
-    return waybills;
+  async findOne(id: number) {
+    const item = await this.repo.findOneBy({ id });
+    if (!item) throw new NotFoundException(`Waybill ${id} not found`);
+    return item;
   }
 
-  async update(id: number, updateWaybillDto: WaybillUpdatedDto,): Promise<WaybillEntity> {
-    const waybill = await this.findOne(id);
-    if (!waybill) {
-      throw new NotFoundException(`Путевой лист с  N${id} не найден`);
-    }
-    const updated = this.waybillRepository.create(waybill);
-
-    return await this.waybillRepository.save(updated);
+  async update(id: number, dto: WaybillUpdatedDto) {
+    const item = await this.findOne(id);
+    Object.assign(item, dto);
+    return this.repo.save(item);
   }
 
-  async remove(id: number): Promise<void> {
-    const waybill = await this.waybillRepository.findOne({ where: { id } });
-    if (!waybill) {
-      throw new NotFoundException(`Путевой лист с N${id} не найден`);
-    }
-    await this.waybillRepository.delete(id);
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.repo.delete(id);
   }
 }

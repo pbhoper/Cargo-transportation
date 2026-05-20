@@ -24,13 +24,13 @@ type TTH = {
   products: Product[];
 };
 
-function RouteComponent() {  //eslint-disable-line
-  const currentDate = new Date().toISOString().split("T")[0];
+function RouteComponent() { //eslint-disable-line
+  const today = new Date().toISOString().split("T")[0];
 
   const emptyForm: TTH = {
     id: 0,
     number: "",
-    date: currentDate,
+    date: today,
     sender: "",
     receiver: "",
     status: "Оформлен",
@@ -39,64 +39,82 @@ function RouteComponent() {  //eslint-disable-line
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-
   const [tthList, setTthList] = useState<TTH[]>([]);
-
   const [form, setForm] = useState<TTH>(emptyForm);
 
-  const filteredList = useMemo(() => {
-    return tthList.filter((item) => {
-      const matchesSearch =
-        item.number.toLowerCase().includes(search.toLowerCase()) ||
-        item.sender.toLowerCase().includes(search.toLowerCase()) ||
-        item.receiver.toLowerCase().includes(search.toLowerCase());
+  const filtered = useMemo(() => {
+    return tthList.filter((t) => {
+      const q =
+        t.number.toLowerCase().includes(search.toLowerCase()) ||
+        t.sender.toLowerCase().includes(search.toLowerCase()) ||
+        t.receiver.toLowerCase().includes(search.toLowerCase());
 
-      const matchesStatus = statusFilter
-        ? item.status === statusFilter
-        : true;
+      const s = statusFilter ? t.status === statusFilter : true;
 
-      return matchesSearch && matchesStatus;
+      return q && s;
     });
   }, [search, statusFilter, tthList]);
 
-  const saveTTH = () => {
-    if (!form.number.trim()) {
-      alert("Введите номер ТТН");
-      return;
+  const statusColor = (status: Status) => {
+    switch (status) {
+      case "Оформлен":
+        return "#f59e0b";
+      case "Принят":
+        return "#3b82f6";
+      case "Доставлен":
+        return "#10b981";
     }
+  };
 
-    if (form.id) {
-      setTthList((prev) =>
-        prev.map((item) => (item.id === form.id ? form : item))
-      );
-    } else {
-      setTthList((prev) => [
-        ...prev,
-        {
-          ...form,
-          id: Date.now(),
-        },
-      ]);
-    }
+  const saveTTH = async () => {
+    if (!form.number.trim()) return alert("Введите номер");
+
+    const payload = {
+      number: form.number,
+      dateCreated: form.date,
+      senderName: form.sender,
+      senderId: "1",
+      recipientId: "1",
+      recipientName: form.receiver,
+      vehicleId: "1",
+      vehicleBrandModel: "N/A",
+      vehicleLicensePlate: "N/A",
+      driverId: "1",
+      driverFullName: "N/A",
+      driverPassport: "N/A",
+      items: form.products,
+    };
+
+    const res = await fetch("http://localhost:3000/tth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    setTthList((prev) => [
+      ...prev,
+      {
+        id: data.id,
+        number: data.number,
+        date: data.dateCreated,
+        sender: data.senderName,
+        receiver: data.recipientName,
+        status: "Оформлен",
+        products: data.items || [],
+      },
+    ]);
 
     setForm(emptyForm);
   };
 
-  const editTTH = (item: TTH) => {
-    setForm(item);
-  };
-
   const addProduct = () => {
-    setForm((prev) => ({
-      ...prev,
+    setForm((p) => ({
+      ...p,
       products: [
-        ...prev.products,
-        {
-          id: Date.now(),
-          name: "",
-          quantity: 1,
-          price: 0,
-        },
+        ...p.products,
+        { id: Date.now(), name: "", quantity: 1, price: 0 },
       ],
     }));
   };
@@ -106,257 +124,178 @@ function RouteComponent() {  //eslint-disable-line
     field: keyof Product,
     value: string | number
   ) => {
-    setForm((prev) => ({
-      ...prev,
-      products: prev.products.map((product) =>
-        product.id === id
-          ? {
-              ...product,
-              [field]: value,
-            }
-          : product
+    setForm((p) => ({
+      ...p,
+      products: p.products.map((x) =>
+        x.id === id ? { ...x, [field]: value } : x
       ),
     }));
   };
 
   const removeProduct = (id: number) => {
-    setForm((prev) => ({
-      ...prev,
-      products: prev.products.filter((p) => p.id !== id),
+    setForm((p) => ({
+      ...p,
+      products: p.products.filter((x) => x.id !== id),
     }));
   };
 
   return (
     <div style={styles.page}>
-      <h1 style={styles.title}>ТТН</h1>
+      <div style={styles.container}>
+        <h1 style={styles.title}>📦 ТТН система</h1>
 
-      {/* Фильтры */}
-      <div style={styles.filters}>
-        <input
-          type="text"
-          placeholder="Поиск ТТН..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={styles.input}
-        />
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={styles.input}
-        >
-          <option value="">Все статусы</option>
-          <option value="Оформлен">Оформлен</option>
-          <option value="Принят">Принят</option>
-          <option value="Доставлен">Доставлен</option>
-        </select>
-      </div>
-
-      {/* Таблица */}
-      <div style={styles.card}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Номер</th>
-              <th style={styles.th}>Дата</th>
-              <th style={styles.th}>Отправитель</th>
-              <th style={styles.th}>Получатель</th>
-              <th style={styles.th}>Статус</th>
-              <th style={styles.th}>Действия</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredList.map((item) => (
-              <tr key={item.id}>
-                <td style={styles.td}>{item.number}</td>
-                <td style={styles.td}>{item.date}</td>
-                <td style={styles.td}>{item.sender}</td>
-                <td style={styles.td}>{item.receiver}</td>
-                <td style={styles.td}>{item.status}</td>
-
-                <td style={styles.td}>
-                  <button
-                    onClick={() => editTTH(item)}
-                    style={styles.editButton}
-                  >
-                    Редактировать
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Форма */}
-      <div style={styles.card}>
-        <h2 style={styles.subtitle}>
-          {form.id ? "Редактирование ТТН" : "Создание ТТН"}
-        </h2>
-
-        <div style={styles.formGrid}>
+        <div style={styles.filters}>
           <input
-            type="text"
-            placeholder="Номер ТТН"
-            value={form.number}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                number: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
-
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                date: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
-
-          <input
-            type="text"
-            placeholder="Отправитель"
-            value={form.sender}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                sender: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
-
-          <input
-            type="text"
-            placeholder="Получатель"
-            value={form.receiver}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                receiver: e.target.value,
-              })
-            }
+            placeholder="Поиск..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             style={styles.input}
           />
 
           <select
-            value={form.status}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                status: e.target.value as Status,
-              })
-            }
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             style={styles.input}
           >
+            <option value="">Все статусы</option>
             <option value="Оформлен">Оформлен</option>
             <option value="Принят">Принят</option>
             <option value="Доставлен">Доставлен</option>
           </select>
         </div>
 
-        {/* Товары */}
-        <div style={{ marginTop: 20 }}>
+        <div style={styles.grid}>
+          {filtered.map((t) => (
+            <div key={t.id} style={styles.card}>
+              <div style={styles.cardTop}>
+                <b>#{t.number}</b>
+                <span
+                  style={{
+                    ...styles.badge,
+                    background: statusColor(t.status),
+                  }}
+                >
+                  {t.status}
+                </span>
+              </div>
+
+              <div style={styles.row}>
+                <span>{t.date}</span>
+              </div>
+
+              <div style={styles.row}>
+                <span>{t.sender}</span>
+              </div>
+
+              <div style={styles.row}>
+                <span>{t.receiver}</span>
+              </div>
+
+              <button
+                onClick={() => setForm(t)}
+                style={styles.editBtn}
+              >
+                Редактировать
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style={styles.form}>
+          <h2>Создание / редактирование</h2>
+
+          <div style={styles.formGrid}>
+            <input
+              placeholder="Номер"
+              value={form.number}
+              onChange={(e) =>
+                setForm({ ...form, number: e.target.value })
+              }
+              style={styles.input}
+            />
+
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) =>
+                setForm({ ...form, date: e.target.value })
+              }
+              style={styles.input}
+            />
+
+            <input
+              placeholder="Отправитель"
+              value={form.sender}
+              onChange={(e) =>
+                setForm({ ...form, sender: e.target.value })
+              }
+              style={styles.input}
+            />
+
+            <input
+              placeholder="Получатель"
+              value={form.receiver}
+              onChange={(e) =>
+                setForm({ ...form, receiver: e.target.value })
+              }
+              style={styles.input}
+            />
+          </div>
+
           <div style={styles.productsHeader}>
             <h3>Товары</h3>
-
-            <button onClick={addProduct} style={styles.addButton}>
-              Добавить товар
+            <button onClick={addProduct} style={styles.addBtn}>
+              + Добавить
             </button>
           </div>
 
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Название</th>
-                <th style={styles.th}>Количество</th>
-                <th style={styles.th}>Цена</th>
-                <th style={styles.th}>Удалить</th>
-              </tr>
-            </thead>
+          {form.products.map((p) => (
+            <div key={p.id} style={styles.productRow}>
+              <input
+                placeholder="Название"
+                value={p.name}
+                onChange={(e) =>
+                  updateProduct(p.id, "name", e.target.value)
+                }
+                style={styles.input}
+              />
 
-            <tbody>
-              {form.products.map((product) => (
-                <tr key={product.id}>
-                  <td style={styles.td}>
-                    <input
-                      type="text"
-                      value={product.name}
-                      onChange={(e) =>
-                        updateProduct(
-                          product.id,
-                          "name",
-                          e.target.value
-                        )
-                      }
-                      style={styles.input}
-                    />
-                  </td>
+              <input
+                type="number"
+                value={p.quantity}
+                onChange={(e) =>
+                  updateProduct(p.id, "quantity", Number(e.target.value))
+                }
+                style={styles.input}
+              />
 
-                  <td style={styles.td}>
-                    <input
-                      type="number"
-                      value={product.quantity}
-                      onChange={(e) =>
-                        updateProduct(
-                          product.id,
-                          "quantity",
-                          Number(e.target.value)
-                        )
-                      }
-                      style={styles.input}
-                    />
-                  </td>
+              <input
+                type="number"
+                value={p.price}
+                onChange={(e) =>
+                  updateProduct(p.id, "price", Number(e.target.value))
+                }
+                style={styles.input}
+              />
 
-                  <td style={styles.td}>
-                    <input
-                      type="number"
-                      value={product.price}
-                      onChange={(e) =>
-                        updateProduct(
-                          product.id,
-                          "price",
-                          Number(e.target.value)
-                        )
-                      }
-                      style={styles.input}
-                    />
-                  </td>
+              <button
+                onClick={() => removeProduct(p.id)}
+                style={styles.deleteBtn}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
 
-                  <td style={styles.td}>
-                    <button
-                      onClick={() => removeProduct(product.id)}
-                      style={styles.deleteButton}
-                    >
-                      Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <div style={styles.actions}>
+            <button onClick={saveTTH} style={styles.saveBtn}>
+               Сохранить
+            </button>
 
-        {/* Кнопки */}
-        <div style={styles.buttons}>
-          <button onClick={saveTTH} style={styles.saveButton}>
-            Сохранить
-          </button>
-
-          <button
-            onClick={() => setForm(emptyForm)}
-            style={styles.clearButton}
-          >
-            Очистить
-          </button>
+            <button onClick={() => setForm(emptyForm)} style={styles.clearBtn}>
+              Очистить
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -365,124 +304,148 @@ function RouteComponent() {  //eslint-disable-line
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
-    padding: "30px",
-    backgroundColor: "#f5f6fa",
+    background: "#0f172a",
     minHeight: "100vh",
+    padding: 30,
+    color: "white",
     fontFamily: "Arial",
   },
 
-  title: {
-    fontSize: "32px",
-    fontWeight: "bold",
-    marginBottom: "20px",
+  container: {
+    maxWidth: 1100,
+    margin: "0 auto",
   },
 
-  subtitle: {
-    fontSize: "24px",
-    marginBottom: "20px",
+  title: {
+    fontSize: 28,
+    marginBottom: 20,
   },
 
   filters: {
     display: "flex",
-    gap: "15px",
-    marginBottom: "20px",
-    flexWrap: "wrap",
-  },
-
-  card: {
-    backgroundColor: "white",
-    borderRadius: "10px",
-    padding: "20px",
-    marginBottom: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    gap: 10,
+    marginBottom: 20,
   },
 
   input: {
-    padding: "10px",
-    borderRadius: "6px",
-    border: "1px solid #ccc",
+    flex: 1,
+    padding: 10,
+    borderRadius: 10,
+    border: "1px solid #334155",
+    background: "#1e293b",
+    color: "white",
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+    gap: 15,
+    marginBottom: 30,
+  },
+
+  card: {
+    background: "#1e293b",
+    padding: 15,
+    borderRadius: 12,
+    border: "1px solid #334155",
+  },
+
+  cardTop: {
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+
+  badge: {
+    padding: "4px 10px",
+    borderRadius: 20,
+    fontSize: 12,
+    color: "white",
+  },
+
+  row: {
+    marginBottom: 5,
+    fontSize: 14,
+  },
+
+  editBtn: {
+    marginTop: 10,
     width: "100%",
-    boxSizing: "border-box",
+    padding: 8,
+    borderRadius: 8,
+    border: "none",
+    background: "#3b82f6",
+    color: "white",
+    cursor: "pointer",
   },
 
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-
-  th: {
-    border: "1px solid #ddd",
-    padding: "10px",
-    backgroundColor: "#f0f0f0",
-    textAlign: "left",
-  },
-
-  td: {
-    border: "1px solid #ddd",
-    padding: "10px",
+  form: {
+    background: "#1e293b",
+    padding: 20,
+    borderRadius: 12,
+    border: "1px solid #334155",
   },
 
   formGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "15px",
+    gap: 10,
+    marginBottom: 15,
   },
 
   productsHeader: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "15px",
+    marginTop: 10,
+    marginBottom: 10,
   },
 
-  buttons: {
+  productRow: {
+    display: "grid",
+    gridTemplateColumns: "2fr 1fr 1fr auto",
+    gap: 10,
+    marginBottom: 10,
+  },
+
+  actions: {
     display: "flex",
-    gap: "10px",
-    marginTop: "20px",
+    gap: 10,
+    marginTop: 15,
   },
 
-  saveButton: {
-    backgroundColor: "#2563eb",
-    color: "white",
+  saveBtn: {
+    flex: 1,
+    padding: 10,
+    background: "#22c55e",
     border: "none",
-    padding: "10px 20px",
-    borderRadius: "6px",
+    borderRadius: 10,
+    color: "white",
     cursor: "pointer",
   },
 
-  clearButton: {
-    backgroundColor: "#6b7280",
-    color: "white",
+  clearBtn: {
+    flex: 1,
+    padding: 10,
+    background: "#64748b",
     border: "none",
-    padding: "10px 20px",
-    borderRadius: "6px",
+    borderRadius: 10,
+    color: "white",
     cursor: "pointer",
   },
 
-  editButton: {
-    backgroundColor: "#3b82f6",
-    color: "white",
+  addBtn: {
+    padding: "6px 12px",
+    background: "#10b981",
     border: "none",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    cursor: "pointer",
+    borderRadius: 8,
+    color: "white",
   },
 
-  addButton: {
-    backgroundColor: "#16a34a",
-    color: "white",
+  deleteBtn: {
+    background: "#ef4444",
     border: "none",
-    padding: "10px 15px",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-
-  deleteButton: {
-    backgroundColor: "#dc2626",
+    borderRadius: 8,
     color: "white",
-    border: "none",
-    padding: "8px 12px",
-    borderRadius: "6px",
-    cursor: "pointer",
+    padding: "0 10px",
   },
 };

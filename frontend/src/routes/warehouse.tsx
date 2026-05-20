@@ -1,22 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import {getWarehouses, createWarehouse} from "../api/warehouse.ts";
 
-export const Route = createFileRoute("/warehouse")({
+export const Route = createFileRoute("/warehouse")({ //eslint-disable-line
   component: RouteComponent,
 });
 
 type Warehouse = {
   id: number;
   name: string;
-  address: string;
-  trusted: boolean;
+  city: string;
+  street: string;
+  house: string;
+  apartment?: string;
+  isTrusted: boolean;
 };
 
-function RouteComponent() { //eslint-disable-line
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([
-
-  ]);
+function RouteComponent() {
+  const [warehouses, setWarehouses] = useState<
+    Warehouse[]
+  >([]);
 
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(10);
@@ -24,59 +28,99 @@ function RouteComponent() { //eslint-disable-line
 
   const [form, setForm] = useState({
     name: "",
-    address: "",
-    trusted: false,
+    city: "",
+    street: "",
+    house: "",
+    apartment: "",
+    isTrusted: false,
   });
+
+  useEffect(() => {
+    const loadWarehouses = async () => {
+      try {
+        const token = localStorage.getItem("token") || "";
+
+        const data = await getWarehouses(token);
+
+        setWarehouses(data ?? []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadWarehouses();
+  }, []);
 
   const filteredWarehouses = useMemo(() => {
     return warehouses.filter((warehouse) => {
       const query = search.toLowerCase();
 
       return (
-        warehouse.name.toLowerCase().includes(query) ||
-        warehouse.address.toLowerCase().includes(query)
+        warehouse.name
+          .toLowerCase()
+          .includes(query) ||
+        warehouse.city
+          .toLowerCase()
+          .includes(query) ||
+        warehouse.street
+          .toLowerCase()
+          .includes(query)
       );
     });
   }, [warehouses, search]);
 
-  const totalPages = Math.ceil(filteredWarehouses.length / pageSize);
-
-  const paginatedWarehouses = filteredWarehouses.slice(
-    (page - 1) * pageSize,
-    page * pageSize
+  const totalPages = Math.ceil(
+    filteredWarehouses.length / pageSize
   );
 
-  const handleCreate = () => {
-    if (!form.name || !form.address) return;
-
-    const newWarehouse: Warehouse = {
-      id: Date.now(),
-      name: form.name,
-      address: form.address,
-      trusted: form.trusted,
-    };
-
-    setWarehouses((prev) => [newWarehouse, ...prev]);
-
-    setForm({
-      name: "",
-      address: "",
-      trusted: false,
-    });
-  };
-
-  const handleDelete = (id: number) => {
-    setWarehouses((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const toggleTrusted = (id: number) => {
-    setWarehouses((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, trusted: !item.trusted }
-          : item
-      )
+  const paginatedWarehouses =
+    filteredWarehouses.slice(
+      (page - 1) * pageSize,
+      page * pageSize
     );
+
+  const handleCreate = async () => {
+    try {
+      const token =
+        localStorage.getItem("token");
+
+      if (!token) {
+        alert("Нет токена");
+        return;
+      }
+
+      const created = await createWarehouse(
+        {
+          name: form.name,
+          city: form.city,
+          street: form.street,
+          house: form.house,
+          apartment: form.apartment,
+          isTrusted: form.isTrusted,
+        },
+        token
+      );
+
+      setWarehouses((prev) => [created, ...prev]);
+
+      setForm({
+        name: "",
+        city: "",
+        street: "",
+        house: "",
+        apartment: "",
+        isTrusted: false,
+      });
+
+      alert("Склад создан");
+    } catch (error: any) { //eslint-disable-line
+      console.error(error);
+
+      alert(
+        error?.response?.data?.message ||
+        "Ошибка создания склада"
+      );
+    }
   };
 
   return (
@@ -87,7 +131,9 @@ function RouteComponent() { //eslint-disable-line
         padding: "140px 40px 40px",
       }}
     >
-      <h1 style={{ marginBottom: 24 }}>Склады / Получатели</h1>
+      <h1 style={{ marginBottom: 24 }}>
+        Склады / Получатели
+      </h1>
 
       <div
         style={{
@@ -106,17 +152,62 @@ function RouteComponent() { //eslint-disable-line
           placeholder="Название склада"
           value={form.name}
           onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
+            setForm({
+              ...form,
+              name: e.target.value,
+            })
           }
           style={inputStyle}
         />
 
         <input
           type="text"
-          placeholder="Адрес"
-          value={form.address}
+          placeholder="Город"
+          value={form.city}
           onChange={(e) =>
-            setForm({ ...form, address: e.target.value })
+            setForm({
+              ...form,
+              city: e.target.value,
+            })
+          }
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Улица"
+          value={form.street}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              street: e.target.value,
+            })
+          }
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Дом"
+          value={form.house}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              house: e.target.value,
+            })
+          }
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Квартира"
+          value={form.apartment}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              apartment: e.target.value,
+            })
           }
           style={inputStyle}
         />
@@ -130,18 +221,28 @@ function RouteComponent() { //eslint-disable-line
         >
           <input
             type="checkbox"
-            checked={form.trusted}
+            checked={form.isTrusted}
             onChange={(e) =>
               setForm({
                 ...form,
-                trusted: e.target.checked,
+                isTrusted:
+                e.target.checked,
               })
             }
           />
           Доверенный склад
         </label>
 
-        <button onClick={handleCreate} style={buttonStyle}>
+        <button
+          onClick={handleCreate}
+          style={buttonStyle}
+          disabled={
+            !form.name ||
+            !form.city ||
+            !form.street ||
+            !form.house
+          }
+        >
           Добавить
         </button>
       </div>
@@ -157,7 +258,7 @@ function RouteComponent() { //eslint-disable-line
       >
         <input
           type="text"
-          placeholder="Поиск по названию или адресу..."
+          placeholder="Поиск..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -177,12 +278,16 @@ function RouteComponent() { //eslint-disable-line
           }}
           style={inputStyle}
         >
-          <option value={10}>10 записей</option>
-          <option value={20}>20 записей</option>
+          <option value={10}>
+            10 записей
+          </option>
+
+          <option value={20}>
+            20 записей
+          </option>
         </select>
       </div>
 
-      {/* TABLE */}
       <div
         style={{
           background: "white",
@@ -197,59 +302,76 @@ function RouteComponent() { //eslint-disable-line
           }}
         >
           <thead>
-          <tr style={{ background: "#ececec" }}>
-            <th style={thStyle}>Название</th>
-            <th style={thStyle}>Адрес</th>
-            <th style={thStyle}>Доверенный</th>
-            <th style={thStyle}>Действия</th>
+          <tr
+            style={{
+              background: "#ececec",
+            }}
+          >
+            <th style={thStyle}>
+              Название
+            </th>
+
+            <th style={thStyle}>
+              Город
+            </th>
+
+            <th style={thStyle}>
+              Улица
+            </th>
+
+            <th style={thStyle}>
+              Дом
+            </th>
+
+            <th style={thStyle}>
+              Доверенный
+            </th>
           </tr>
           </thead>
 
           <tbody>
-          {paginatedWarehouses.map((warehouse) => (
-            <tr key={warehouse.id}>
-              <td style={tdStyle}>{warehouse.name}</td>
-              <td style={tdStyle}>{warehouse.address}</td>
+          {paginatedWarehouses.map(
+            (warehouse) => (
+              <tr key={warehouse.id}>
+                <td style={tdStyle}>
+                  {warehouse.name}
+                </td>
 
-              <td style={tdStyle}>
-                <input
-                  type="checkbox"
-                  checked={warehouse.trusted}
-                  onChange={() =>
-                    toggleTrusted(warehouse.id)
-                  }
-                />
-              </td>
+                <td style={tdStyle}>
+                  {warehouse.city}
+                </td>
 
-              <td style={tdStyle}>
-                <button
-                  onClick={() =>
-                    handleDelete(warehouse.id)
-                  }
+                <td style={tdStyle}>
+                  {warehouse.street}
+                </td>
+
+                <td style={tdStyle}>
+                  {warehouse.house}
+                </td>
+
+                <td style={tdStyle}>
+                  {warehouse.isTrusted
+                    ? "Да"
+                    : "Нет"}
+                </td>
+              </tr>
+            )
+          )}
+
+          {paginatedWarehouses.length ===
+            0 && (
+              <tr>
+                <td
+                  colSpan={5}
                   style={{
-                    ...buttonStyle,
-                    background: "#dc2626",
+                    padding: 24,
+                    textAlign: "center",
                   }}
                 >
-                  Удалить
-                </button>
-              </td>
-            </tr>
-          ))}
-
-          {paginatedWarehouses.length === 0 && (
-            <tr>
-              <td
-                colSpan={4}
-                style={{
-                  padding: 24,
-                  textAlign: "center",
-                }}
-              >
-                Ничего не найдено
-              </td>
-            </tr>
-          )}
+                  Ничего не найдено
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -264,19 +386,31 @@ function RouteComponent() { //eslint-disable-line
       >
         <button
           disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
+          onClick={() =>
+            setPage((prev) => prev - 1)
+          }
           style={buttonStyle}
         >
           Назад
         </button>
 
-        <span style={{ alignSelf: "center" }}>
-          Страница {page} из {totalPages || 1}
+        <span
+          style={{
+            alignSelf: "center",
+          }}
+        >
+          Страница {page} из{" "}
+          {totalPages || 1}
         </span>
 
         <button
-          disabled={page === totalPages || totalPages === 0}
-          onClick={() => setPage((prev) => prev + 1)}
+          disabled={
+            page === totalPages ||
+            totalPages === 0
+          }
+          onClick={() =>
+            setPage((prev) => prev + 1)
+          }
           style={buttonStyle}
         >
           Вперед
@@ -311,3 +445,5 @@ const tdStyle: React.CSSProperties = {
   padding: 14,
   borderTop: "1px solid #eee",
 };
+
+export default RouteComponent;

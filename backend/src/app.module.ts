@@ -29,11 +29,6 @@ import { WriteOffController } from './writeoff/writeoff.controller';
     EmailController,
     AuthController,
     TthController,
-    WarehousesController,
-    GoodsController,
-    UsersController,
-    WaybillController,
-    WriteOffController,
   ],
   providers: [AppService],
   imports: [
@@ -49,14 +44,14 @@ import { WriteOffController } from './writeoff/writeoff.controller';
       synchronize: true,
     }),
     TthModule,
-    WarehousesModule,
+    WarehousesModule, // 👈 тут всё есть
     AuthModule,
     ReportModule,
     MailModule,
     WriteOffModule,
     WaybillModule,
     UsersModule,
-    GoodsModule
+    GoodsModule,
   ],
 })
 export class AppModule {}

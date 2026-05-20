@@ -82,7 +82,7 @@ export const Header = () => {
               <>
                 <li><a href="/reports">Отчеты</a></li>
                 <li><a href="/tth">ТТН</a></li>
-                <li><a href="/travel/sheets">Путевые листы</a></li>
+                <li><a href="/waybill">Путевые листы</a></li>
                 <li><a href="/warehouse">Склады</a></li>
               </>
             )}

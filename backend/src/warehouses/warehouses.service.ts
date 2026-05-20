@@ -1,6 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { WarehousesEntity } from '../entity/warehouses.entity';
 import { WarehouseDto } from '../dto/warehouses-dto';
 
@@ -11,9 +13,15 @@ interface PaginationQuery {
 
 interface PaginatedResult {
   data: WarehousesEntity[];
-  meta: { total: number; page: number; limit: number; totalPages: number };
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
+@Injectable()
 export class WarehousesService {
   constructor(
     @InjectRepository(WarehousesEntity)
@@ -22,33 +30,50 @@ export class WarehousesService {
 
   async create(createWarehouseDto: WarehouseDto): Promise<WarehousesEntity> {
     const warehouse = this.warehouseRepository.create(createWarehouseDto);
-    if (createWarehouseDto.isTrusted) {
-      console.log(`true склад: ${createWarehouseDto.name}`); // logger
-    }
+
     return this.warehouseRepository.save(warehouse);
   }
 
-  async findAll(query: PaginationQuery): Promise<PaginatedResult> {
+  async findAll(query: PaginationQuery): Promise<{
+    data: WarehousesEntity[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
+  }> {
     const page = query.page || 1;
     const limit = query.limit || 10;
+
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.warehouseRepository.findAndCount({ skip, take: limit, order:
-        { CreatedAt: 'DESC' },
+    const [data, total] = await this.warehouseRepository.findAndCount({
+      skip,
+      take: limit,
+      order: {
+        createdAt: 'DESC',
+      },
     });
 
-    return { data,
+    return {
+      data,
       meta: {
-        total, page, limit, totalPages: Math.ceil(total / limit),
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
     };
   }
 
   async findOne(id: number): Promise<WarehousesEntity> {
     const warehouse = await this.warehouseRepository.findOneBy({ id });
+
     if (!warehouse) {
-      throw new NotFoundException(`Склад N${id} не найден`);
+      throw new NotFoundException(`Склад ${id} не найден`);
     }
+
     return warehouse;
   }
 
@@ -57,20 +82,24 @@ export class WarehousesService {
     updateDto: Partial<WarehouseDto>,
   ): Promise<WarehousesEntity> {
     const warehouse = await this.findOne(id);
-    if (warehouse.isTrusted && !updateDto.isTrusted) {
-      throw new NotFoundException(`Склад с таким ${id} не найден`);
-    }
 
-    const updatedWarehouse = this.warehouseRepository.create({...warehouse, ...updateDto,});
+    const updatedWarehouse = this.warehouseRepository.create({
+      ...warehouse,
+      ...updateDto,
+    });
 
     return this.warehouseRepository.save(updatedWarehouse);
   }
 
   async remove(id: number): Promise<void> {
-    const warehouse = await this.warehouseRepository.findOne({ where: { id } });
+    const warehouse = await this.warehouseRepository.findOne({
+      where: { id },
+    });
+
     if (!warehouse) {
-      throw new NotFoundException('Склад не найден или был снесён');
+      throw new NotFoundException('Склад не найден');
     }
+
     await this.warehouseRepository.softRemove(warehouse);
   }
 }

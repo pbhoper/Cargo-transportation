@@ -1,13 +1,16 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class WaybillEntity {
+export class GoodsEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  title: string;
+  startDate: string;
 
   @Column()
-  ttn: string;
+  endDate: number;
+
+  @Column()
+  clientId: string;
 }

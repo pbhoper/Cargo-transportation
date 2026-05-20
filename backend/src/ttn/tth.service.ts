@@ -36,10 +36,11 @@ export class TthService {
   }
 
   async update(id: number, updateTthDto: TthUpdateDto): Promise<TthEntity> {
-    const tth = await this.findOne(id);
+    await this.findOne(id);
 
-    const UpdateTth =  this.tthRepository.create({...tth, ...updateTthDto});
-    return await this.tthRepository.save(UpdateTth);
+    await this.tthRepository.update(id, updateTthDto);
+
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {

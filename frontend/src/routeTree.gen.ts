@@ -9,12 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WaybillRouteImport } from './routes/waybill'
 import { Route as WarehouseRouteImport } from './routes/warehouse'
 import { Route as TthRouteImport } from './routes/tth'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TravelSheetsRouteImport } from './routes/travel.sheets'
 
+const WaybillRoute = WaybillRouteImport.update({
+  id: '/waybill',
+  path: '/waybill',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WarehouseRoute = WarehouseRouteImport.update({
   id: '/warehouse',
   path: '/warehouse',
@@ -35,25 +40,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TravelSheetsRoute = TravelSheetsRouteImport.update({
-  id: '/travel/sheets',
-  path: '/travel/sheets',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
-  '/travel/sheets': typeof TravelSheetsRoute
+  '/waybill': typeof WaybillRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
-  '/travel/sheets': typeof TravelSheetsRoute
+  '/waybill': typeof WaybillRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,14 +61,14 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
-  '/travel/sheets': typeof TravelSheetsRoute
+  '/waybill': typeof WaybillRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
+  fullPaths: '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
-  id: '__root__' | '/' | '/reports' | '/tth' | '/warehouse' | '/travel/sheets'
+  to: '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
+  id: '__root__' | '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,11 +76,18 @@ export interface RootRouteChildren {
   ReportsRoute: typeof ReportsRoute
   TthRoute: typeof TthRoute
   WarehouseRoute: typeof WarehouseRoute
-  TravelSheetsRoute: typeof TravelSheetsRoute
+  WaybillRoute: typeof WaybillRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/waybill': {
+      id: '/waybill'
+      path: '/waybill'
+      fullPath: '/waybill'
+      preLoaderRoute: typeof WaybillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/warehouse': {
       id: '/warehouse'
       path: '/warehouse'
@@ -109,13 +116,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/travel/sheets': {
-      id: '/travel/sheets'
-      path: '/travel/sheets'
-      fullPath: '/travel/sheets'
-      preLoaderRoute: typeof TravelSheetsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -124,7 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsRoute: ReportsRoute,
   TthRoute: TthRoute,
   WarehouseRoute: WarehouseRoute,
-  TravelSheetsRoute: TravelSheetsRoute,
+  WaybillRoute: WaybillRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { TthEnum } from '../enum/tth.enum';
 import { TthItemDto } from '../dto/tth.item-dto';
-import {TthEnum} from '../enum/tth.enum';
 
-@Entity('Tth')
+@Entity('tth')
 export class TthEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,8 +25,8 @@ export class TthEntity {
   @Column({ nullable: true })
   senderAddress?: string;
 
-  @Column({ nullable: true })
-  senderType?: TthEnum
+  @Column({ type: 'enum', enum: TthEnum, nullable: true })
+  senderType?: TthEnum;
 
   @Column()
   recipientId: string;
@@ -37,8 +37,8 @@ export class TthEntity {
   @Column({ nullable: true })
   recipientAddress?: string;
 
-  @Column({ nullable: true })
-  recipientType?: TthEnum
+  @Column({ type: 'enum', enum: TthEnum, nullable: true })
+  recipientType?: TthEnum;
 
   @Column()
   vehicleId: string;
@@ -49,8 +49,8 @@ export class TthEntity {
   @Column()
   vehicleLicensePlate: string;
 
-  @Column({ nullable: true })
-  vehicleType?: TthEnum
+  @Column({ type: 'enum', enum: TthEnum, nullable: true })
+  vehicleType?: TthEnum;
 
   @Column()
   driverId: string;
@@ -64,6 +64,7 @@ export class TthEntity {
   @Column({ nullable: true })
   driverPhone?: string;
 
-  @Column(() => TthItemDto)
+  // ✅ FIX: массив через JSON
+  @Column({ type: 'json', nullable: true })
   items: TthItemDto[];
 }
