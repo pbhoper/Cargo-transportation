@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as ExcelJS from 'exceljs';
 import type { Response } from 'express';
+import { Repository } from 'typeorm';
 import { ReportDto } from '../dto/report-dto';
+import { ReportEntity} from '../entity/report.entity';
 
 @Injectable()
 export class ReportService {
+  constructor(
+    @InjectRepository(ReportEntity)
+    private readonly reportRepository: Repository<ReportEntity>,
+  ) {}
+
   private createWorkbook(): ExcelJS.Workbook {
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Logistics System';
@@ -13,13 +21,18 @@ export class ReportService {
 
   private styleSheet(sheet: ExcelJS.Worksheet) {
     sheet.getRow(1).font = { bold: true };
-    sheet.getRow(1).alignment = { horizontal: 'center' };
+
+    sheet.getRow(1).alignment = {
+      horizontal: 'center',
+    };
+
     sheet.getRow(1).eachCell((cell) => {
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'F2F2F2' },
       };
+
       cell.border = {
         top: { style: 'thin' },
         left: { style: 'thin' },
@@ -29,15 +42,35 @@ export class ReportService {
     });
   }
 
-  private async finalizeResponse(workbook: ExcelJS.Workbook, res: Response, name: string) {
-    res.setHeader('Content-Type', 'document');
+  private async finalizeResponse(
+    workbook: ExcelJS.Workbook,
+    res: Response,
+    name: string,
+  ) {
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+
     res.setHeader('Content-Disposition', `attachment; filename=${name}.xlsx`);
+
     await workbook.xlsx.write(res);
+
     res.end();
   }
 
+  private async saveReportQuery(query: ReportDto) {
+    await this.reportRepository.save({
+      startDate: query.startDate,
+      endDate: query.endDate,
+      clientId: query.clientId,
+    });
+  }
   async generateWaybillsReport(query: ReportDto, res: Response) {
+    await this.saveReportQuery(query);
+
     const workbook = this.createWorkbook();
+
     const sheet = workbook.addWorksheet('waybills');
 
     sheet.columns = [
@@ -50,14 +83,18 @@ export class ReportService {
       { header: 'Departure Date', key: 'date', width: 15 },
     ];
 
-    const data = [];
-    sheet.addRows(data);
+    sheet.addRows([]);
+
     this.styleSheet(sheet);
+
     await this.finalizeResponse(workbook, res, 'waybills-report');
   }
 
   async generateLossesReport(query: ReportDto, res: Response) {
+    await this.saveReportQuery(query);
+
     const workbook = this.createWorkbook();
+
     const sheet = workbook.addWorksheet('losses');
 
     sheet.columns = [
@@ -70,29 +107,37 @@ export class ReportService {
       { header: 'Responsible Person', key: 'responsible', width: 25 },
     ];
 
-    const data = [];
-    sheet.addRows(data);
+    sheet.addRows([]);
+
     this.styleSheet(sheet);
+
     await this.finalizeResponse(workbook, res, 'losses-report');
   }
 
   async generateLossesByDriverReport(query: ReportDto, res: Response) {
+    await this.saveReportQuery(query);
+
     const workbook = this.createWorkbook();
-    const sheet = workbook.addWorksheet('losses-By-Driver');
+
+    const sheet = workbook.addWorksheet('losses-by-driver');
 
     sheet.columns = [
       { header: 'Driver Full Name', key: 'driver', width: 35 },
       { header: 'Total Loss Sum', key: 'totalAmount', width: 20 },
     ];
 
-    const data = [];
-    sheet.addRows(data);
+    sheet.addRows([]);
+
     this.styleSheet(sheet);
+
     await this.finalizeResponse(workbook, res, 'losses-by-driver');
   }
 
   async generateProfitReport(query: ReportDto, res: Response) {
+    await this.saveReportQuery(query);
+
     const workbook = this.createWorkbook();
+
     const sheet = workbook.addWorksheet('profit');
 
     sheet.columns = [
@@ -102,15 +147,19 @@ export class ReportService {
       { header: 'Net Profit', key: 'profit', width: 15 },
     ];
 
-    const data = [];
-    sheet.addRows(data);
+    sheet.addRows([]);
+
     this.styleSheet(sheet);
+
     await this.finalizeResponse(workbook, res, 'profit-report');
   }
 
   async generateClientStatsReport(query: ReportDto, res: Response) {
+    await this.saveReportQuery(query);
+
     const workbook = this.createWorkbook();
-    const sheet = workbook.addWorksheet('client-Statistics');
+
+    const sheet = workbook.addWorksheet('client-statistics');
 
     sheet.columns = [
       { header: 'Total Clients', key: 'total', width: 15 },
@@ -119,9 +168,10 @@ export class ReportService {
       { header: 'Service Profit', key: 'profit', width: 15 },
     ];
 
-    const data = [];
-    sheet.addRows(data);
+    sheet.addRows([]);
+
     this.styleSheet(sheet);
+
     await this.finalizeResponse(workbook, res, 'client-statistics');
   }
 }

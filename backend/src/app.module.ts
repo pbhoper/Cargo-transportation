@@ -16,11 +16,6 @@ import { WriteOffModule } from './writeoff/writeoff.module';
 import { WaybillModule } from './waybill/waybill.module';
 import { UsersModule } from './users/users.module';
 import { GoodsModule } from './goods/goods.module';
-import { WarehousesController } from './warehouses/warehouses.controller';
-import { GoodsController } from './goods/goods.controller';
-import { UsersController } from './users/users.controller';
-import { WaybillController } from './waybill/waybill.controller';
-import { WriteOffController } from './writeoff/writeoff.controller';
 
 @Module({
   controllers: [
@@ -44,7 +39,7 @@ import { WriteOffController } from './writeoff/writeoff.controller';
       synchronize: true,
     }),
     TthModule,
-    WarehousesModule, // 👈 тут всё есть
+    WarehousesModule,
     AuthModule,
     ReportModule,
     MailModule,

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class GoodsEntity {
+@Entity('reports')
+export class ReportEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -9,8 +9,8 @@ export class GoodsEntity {
   startDate: string;
 
   @Column()
-  endDate: number;
+  endDate: string;
 
-  @Column()
-  clientId: string;
+  @Column({ nullable: true })
+  clientId?: string;
 }
