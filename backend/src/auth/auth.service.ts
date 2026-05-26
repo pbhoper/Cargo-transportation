@@ -2,9 +2,10 @@ import { Injectable, ForbiddenException, UnauthorizedException, } from '@nestjs/
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthEntity } from '../entity/auth.entity';
-import { AuthDto } from '../dto/auth-dto';
+import { RegisterDto } from '../dto/register-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from '../dto/login-dto';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(authDto: AuthDto) {
+  async register(authDto: RegisterDto) {
     const candidate = await this.clientRepository.findOne({
       where: {
         email: authDto.email,
@@ -35,10 +36,10 @@ export class AuthService {
     return this.clientRepository.save(user);
   }
 
-  async login(authDto: AuthDto) {
+  async login(authDto: LoginDto) {
     const user = await this.clientRepository.findOne({
       where: {
-        email: authDto.email,
+        username: authDto.username,
       },
     });
 

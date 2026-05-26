@@ -24,19 +24,21 @@ type TTH = {
   products: Product[];
 };
 
+const today = new Date().toISOString().split("T")[0];
+
+const API_URL = "http://localhost:3000/tth"
+
+const emptyForm: TTH = {
+  id: 0, 
+  number: "",
+  date: today,
+  sender: "",
+  receiver: "",
+  status: "Оформлен",
+  products: [],
+};
+
 function RouteComponent() { //eslint-disable-line
-  const today = new Date().toISOString().split("T")[0];
-
-  const emptyForm: TTH = {
-    id: 0,
-    number: "",
-    date: today,
-    sender: "",
-    receiver: "",
-    status: "Оформлен",
-    products: [],
-  };
-
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [tthList, setTthList] = useState<TTH[]>([]);
@@ -85,7 +87,7 @@ function RouteComponent() { //eslint-disable-line
       items: form.products,
     };
 
-    const res = await fetch("http://localhost:3000/tth", {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

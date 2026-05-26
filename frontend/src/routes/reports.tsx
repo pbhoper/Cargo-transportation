@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import {createFileRoute} from '@tanstack/react-router';
 import {
   Button,
   Card,
@@ -16,10 +16,10 @@ import {
 
 import axios from 'axios';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import {useMemo, useState} from 'react';
 
-const { RangePicker } = DatePicker;
-const { Title } = Typography;
+const {RangePicker} = DatePicker;
+const {Title} = Typography;
 
 export const Route = createFileRoute('/reports')({
   component: RouteComponent,
@@ -31,12 +31,45 @@ type ReportType =
   | 'losses-by-driver'
   | 'profit';
 
+const API_URL = "http://localhost:3000/report/"
+
 const reportOptions = [
-  { label: 'Путевые листы', value: 'waybill' },
-  { label: 'Убытки компании', value: 'losses' },
-  { label: 'Убытки по водителям', value: 'losses-by-driver' },
-  { label: 'Прибыль компании', value: 'profit' },
+  {label: 'Путевые листы', value: 'waybill'},
+  {label: 'Убытки компании', value: 'losses'},
+  {label: 'Убытки по водителям', value: 'losses-by-driver'},
+  {label: 'Прибыль компании', value: 'profit'},
 ];
+
+const reportTypeColumnsMapping: Record<ReportType, { title: string; dataIndex: string }[]> = {
+  waybill: [
+    {title: 'ID', dataIndex: 'id'},
+    {title: 'TTN', dataIndex: 'ttn'},
+    {title: 'Отправитель', dataIndex: 'sender'},
+    {title: 'Получатель', dataIndex: 'receiver'},
+    {title: 'Машина', dataIndex: 'car'},
+    {title: 'Водитель', dataIndex: 'driver'},
+    {title: 'Дата', dataIndex: 'date'},
+  ],
+  losses: [
+    {title: 'Дата', dataIndex: 'date'},
+    {title: 'TTN', dataIndex: 'ttn'},
+    {title: 'Продукт', dataIndex: 'product'},
+    {title: 'Количество', dataIndex: 'quantity'},
+    {title: 'Цена', dataIndex: 'price'},
+    {title: 'Убыток', dataIndex: 'total'},
+    {title: 'Ответственный', dataIndex: 'responsible'},
+  ],
+  'losses-by-driver': [
+    {title: 'Водитель', dataIndex: 'driver'},
+    {title: 'Сумма убытков', dataIndex: 'totalAmount'},
+  ],
+  profit: [
+    {title: 'Период', dataIndex: 'period'},
+    {title: 'Доход', dataIndex: 'revenue'},
+    {title: 'Расходы', dataIndex: 'expenses'},
+    {title: 'Прибыль', dataIndex: 'profit'},
+  ],
+};
 
 function RouteComponent() { //eslint-disable-line
   const [loading, setLoading] = useState(false);
@@ -47,46 +80,7 @@ function RouteComponent() { //eslint-disable-line
   const [limit, setLimit] = useState(10);
 
   const columns = useMemo(() => {
-    switch (reportType) {
-      case 'waybill':
-        return [
-          { title: 'ID', dataIndex: 'id' },
-          { title: 'TTN', dataIndex: 'ttn' },
-          { title: 'Отправитель', dataIndex: 'sender' },
-          { title: 'Получатель', dataIndex: 'receiver' },
-          { title: 'Машина', dataIndex: 'car' },
-          { title: 'Водитель', dataIndex: 'driver' },
-          { title: 'Дата', dataIndex: 'date' },
-        ];
-
-      case 'losses':
-        return [
-          { title: 'Дата', dataIndex: 'date' },
-          { title: 'TTN', dataIndex: 'ttn' },
-          { title: 'Продукт', dataIndex: 'product' },
-          { title: 'Количество', dataIndex: 'quantity' },
-          { title: 'Цена', dataIndex: 'price' },
-          { title: 'Убыток', dataIndex: 'total' },
-          { title: 'Ответственный', dataIndex: 'responsible' },
-        ];
-
-      case 'losses-by-driver':
-        return [
-          { title: 'Водитель', dataIndex: 'driver' },
-          { title: 'Сумма убытков', dataIndex: 'totalAmount' },
-        ];
-
-      case 'profit':
-        return [
-          { title: 'Период', dataIndex: 'period' },
-          { title: 'Доход', dataIndex: 'revenue' },
-          { title: 'Расходы', dataIndex: 'expenses' },
-          { title: 'Прибыль', dataIndex: 'profit' },
-        ];
-
-      default:
-        return [];
-    }
+    return reportTypeColumnsMapping[reportType];
   }, [reportType]);
 
   const handleDownload = async () => {
@@ -100,9 +94,9 @@ function RouteComponent() { //eslint-disable-line
       const [start, end] = dates;
       const startDate = start.format('YYYY-MM-DD');
       const endDate = end.format('YYYY-MM-DD');
-
       const response = await axios.get(
-        `http://localhost:3000/report/${reportType}`,
+
+        `${API_URL}${reportType}`,
         {
           params: {
             startDate,
@@ -139,20 +133,21 @@ function RouteComponent() { //eslint-disable-line
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', padding: 16, background: '#f5f5f5' }}>
-      <Card style={{ width: '100%', height: '100%' }} bodyStyle={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <Flex vertical gap={24} style={{ height: '100%' }}>
+    <div style={{width: '100vw', height: '100vh', padding: 16, background: '#f5f5f5'}}>
+      <Card style={{width: '100%', height: '100%'}}
+            bodyStyle={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+        <Flex vertical gap={24} style={{height: '100%'}}>
           <Title level={3}>XLSX Отчеты</Title>
 
           <Form layout="vertical">
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Space direction="vertical" size={16} style={{width: '100%'}}>
               <Form.Item label="Тип отчета">
-                <Select value={reportType} options={reportOptions} onChange={setReportType} />
+                <Select value={reportType} options={reportOptions} onChange={setReportType}/>
               </Form.Item>
 
               <Form.Item label="Диапазон дат">
                 <RangePicker
-                  style={{ width: '100%' }}
+                  style={{width: '100%'}}
                   onChange={(value) => setDates(value as any)}  //eslint-disable-line
                 />
               </Form.Item>
@@ -170,14 +165,14 @@ function RouteComponent() { //eslint-disable-line
             </Space>
           </Form>
 
-          <div style={{ flex: 1, overflow: 'hidden' }}>
+          <div style={{flex: 1, overflow: 'hidden'}}>
             <Table
               bordered
               columns={columns}
               dataSource={[]}
               pagination={false}
               rowKey="id"
-              scroll={{ y: '100%' }}
+              scroll={{y: '100%'}}
             />
           </div>
 

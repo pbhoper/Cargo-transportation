@@ -15,9 +15,6 @@ export class AuthEntity {
   password: string;
 
   @Column()
-  passwordRepeat: string;
-
-  @Column()
   firstName: string;
 
   @Column()

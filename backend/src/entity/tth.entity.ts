@@ -64,7 +64,6 @@ export class TthEntity {
   @Column({ nullable: true })
   driverPhone?: string;
 
-  // ✅ FIX: массив через JSON
   @Column({ type: 'json', nullable: true })
   items: TthItemDto[];
 }

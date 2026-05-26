@@ -37,10 +37,7 @@ function RouteComponent() {
   useEffect(() => {
     const loadWarehouses = async () => {
       try {
-        const token = localStorage.getItem("token") || "";
-
-        const data = await getWarehouses(token);
-
+        const data = await getWarehouses();
         setWarehouses(data ?? []);
       } catch (error) {
         console.error(error);
@@ -97,7 +94,6 @@ function RouteComponent() {
           apartment: form.apartment,
           isTrusted: form.isTrusted,
         },
-        token
       );
 
       setWarehouses((prev) => [created, ...prev]);

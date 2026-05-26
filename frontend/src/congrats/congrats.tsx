@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 
 type Template = {
   id: number;
@@ -35,8 +35,8 @@ const defaultTemplates: Template[] = [
 ];
 
 const users = [
-  { id: 1, name: 'Сергей Иванович' },
-  { id: 2, name: 'Ольга Ивановна' },
+  {id: 1, name: 'Сергей Иванович'},
+  {id: 2, name: 'Ольга Ивановна'},
 ];
 
 export const BirthdayTemplateForm: React.FC = () => {
@@ -59,14 +59,14 @@ export const BirthdayTemplateForm: React.FC = () => {
 
   const handleTextChange = (value: string) => {
     setTemplates((prev) => prev.map((t) =>
-        t.id === selectedTemplateId ? { ...t, text: value } : t
+        t.id === selectedTemplateId ? {...t, text: value} : t
       )
     );
   };
 
   const handleColorChange = (value: string) => {
     setTemplates((prev) => prev.map((t) =>
-        t.id === selectedTemplateId ? { ...t, backgroundColor: value }:t
+        t.id === selectedTemplateId ? {...t, backgroundColor: value} : t
       )
     );
   };
@@ -80,8 +80,9 @@ export const BirthdayTemplateForm: React.FC = () => {
 
     const reader = new FileReader();
 
-    reader.onloadend = () => {setTemplates((prev) => prev.map((t) =>
-          t.id === selectedTemplateId ? { ...t, image: reader.result as string }:t
+    reader.onloadend = () => {
+      setTemplates((prev) => prev.map((t) =>
+          t.id === selectedTemplateId ? {...t, image: reader.result as string} : t
         )
       );
     };
@@ -99,12 +100,12 @@ export const BirthdayTemplateForm: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 900 }}>
+    <div style={{padding: 24, maxWidth: 900}}>
       <h2>Шаблоны поздравлений</h2>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{marginBottom: 16}}>
         <label>Пользователь:</label>
-        <br />
+        <br/>
         <select
           value={selectedUserId}
           onChange={(e) => setSelectedUserId(Number(e.target.value))}
@@ -117,9 +118,9 @@ export const BirthdayTemplateForm: React.FC = () => {
         </select>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{marginBottom: 16}}>
         <label>Выбор шаблона:</label>
-        <br />
+        <br/>
         <select
           value={selectedTemplateId}
           onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
@@ -132,20 +133,20 @@ export const BirthdayTemplateForm: React.FC = () => {
         </select>
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{marginBottom: 16}}>
         <label>Текст шаблона:</label>
-        <br />
+        <br/>
         <textarea
           rows={10}
-          style={{ width: '100%' }}
+          style={{width: '100%'}}
           value={selectedTemplate.text}
           onChange={(e) => handleTextChange(e.target.value)}
         />
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{marginBottom: 16}}>
         <label>Цвет фона:</label>
-        <br />
+        <br/>
         <input
           type="color"
           value={selectedTemplate.backgroundColor}
@@ -153,18 +154,18 @@ export const BirthdayTemplateForm: React.FC = () => {
         />
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{marginBottom: 16}}>
         <label>Картинка заголовка:</label>
-        <br />
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
+        <br/>
+        <input type="file" accept="image/*" onChange={handleImageUpload}/>
       </div>
 
-      <div style={{ display: 'flex', gap: 12 }}>
+      <div style={{display: 'flex', gap: 12}}>
         <button onClick={handleSave}>Сохранить</button>
         <button onClick={handleCancel}>Отменить</button>
       </div>
 
-      <hr style={{ margin: '32px 0' }} />
+      <hr style={{margin: '32px 0'}}/>
 
       <h3>Preview Email</h3>
 

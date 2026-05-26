@@ -5,12 +5,11 @@ import {
   type MenuProps,
   Space,
 } from "antd";
-import { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
+import {useState} from 'react';
+import {SettingOutlined} from '@ant-design/icons';
 import AuthPage from "../../pages/auth-page.tsx";
 import {useAuth} from "../../forms/authcontext.tsx";
-
-type Segment = "login" | "register";
+import type {Segment} from "../../types/auth.interface.ts";
 
 function DownOutlined() {
   return null;
@@ -20,7 +19,7 @@ export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [segment, setSegment] = useState<Segment>("login");
 
-  const { isAuth, logout } = useAuth();
+  const {isAuth, logout} = useAuth();
 
   const items: MenuProps['items'] = [
     {
@@ -42,7 +41,7 @@ export const Header = () => {
     {
       key: '4',
       label: 'Settings',
-      icon: <SettingOutlined />,
+      icon: <SettingOutlined/>,
     },
     {
       key: '5',
@@ -106,11 +105,11 @@ export const Header = () => {
                 />
               </>
             ) : (
-              <Dropdown menu={{ items }}>
+              <Dropdown menu={{items}}>
                 <a onClick={(e) => e.preventDefault()}>
                   <Space>
                     Мой аккаунт
-                    <DownOutlined />
+                    <DownOutlined/>
                   </Space>
                 </a>
               </Dropdown>

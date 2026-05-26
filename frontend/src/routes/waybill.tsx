@@ -11,7 +11,8 @@ type Waybill = {
   ttn: string;
 };
 
-const API = "http://localhost:3000/waybill";
+// TODO: rewrite !
+const API_URL = "http://localhost:3000/waybill";
 
 function RouteComponent() { //eslint-disable-line
   const [sheets, setSheets] = useState<Waybill[]>([]);
@@ -23,7 +24,7 @@ function RouteComponent() { //eslint-disable-line
   });
 
   const load = async () => {
-    const res = await fetch(API);
+    const res = await fetch(API_URL);
     const data = await res.json();
     setSheets(data);
   };
@@ -39,13 +40,14 @@ function RouteComponent() { //eslint-disable-line
 
   const save = async () => {
     if (editingId) {
-      await fetch(`${API}/${editingId}`, {
+      // TODO: вынести
+      await fetch(`${API_URL}/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
     } else {
-      await fetch(API, {
+      await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -62,7 +64,7 @@ function RouteComponent() { //eslint-disable-line
   };
 
   const remove = async (id: number) => {
-    await fetch(`${API}/${id}`, {
+    await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
     load();

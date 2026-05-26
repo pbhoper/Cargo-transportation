@@ -2,22 +2,31 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000/warehouses";
 
-export const getWarehouses = async (token: string) => {
-  const response = await axios.get(API_URL, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+const apiClient = axios.create({
+  baseURL: API_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Optional: Add request interceptor (e.g., for auth tokens)
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token') ?? '';
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const getWarehouses = async () => {
+  const response = await apiClient.get(API_URL);
 
   return response.data.data;
 };
 
-export const createWarehouse = async (data: any, token: string) => {
-  const response = await axios.post(API_URL, data, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const createWarehouse = async (data: Record<string, unknown>) => {
+  const response = await apiClient.post(API_URL, data);
 
   return response.data;
 };

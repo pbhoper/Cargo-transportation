@@ -12,7 +12,6 @@ import { TthItemDto } from './tth.item-dto';
 import { TthEnum } from '../enum/tth.enum';
 
 export class CreateTthDto {
-  // ❌ FIX: id не должен приходить от клиента
   @IsOptional()
   @IsNumber()
   id?: number;

@@ -1,10 +1,12 @@
 import {Button, Flex, Form, type FormProps, Input, notification} from "antd";
 import type {FC, JSX} from "react";
-import type {RegisterTypes} from "../interfaces/register.interface.ts";
+import type {RegisterTypes} from "../types/register.interface.ts";
 import axios, { AxiosError } from "axios";
 
+const API_URL = "http://localhost:3000/"
+
 const http = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: API_URL,
   params: {},
   withCredentials: true
 })
@@ -36,7 +38,7 @@ const RegisterForm: FC<Props> = ({ onSuccess }): JSX.Element => {
         }
       }
       notification.error({
-        message: "Ошибка регистрации",
+        title: "Ошибка регистрации",
         description: errorMessage
       })
     }

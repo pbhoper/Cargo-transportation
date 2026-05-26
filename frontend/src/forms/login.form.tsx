@@ -1,7 +1,7 @@
 import { Button, Flex, Form, Input, message } from 'antd';
 import type { FC, JSX } from 'react';
 import type { FormProps } from 'antd';
-import type { LoginTypes } from '../interfaces/login.interface.ts';
+import type { LoginTypes } from '../types/login.interface.ts';
 import { useAuth} from "./authcontext.tsx";
 
 interface Props {
@@ -11,15 +11,17 @@ interface Props {
 const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
   const { login } = useAuth();
 
+  const API_URL = "http://localhost:3000/auth/login"
+
   const handleFinish: FormProps<LoginTypes>['onFinish'] = async (values) => {
     try {
-      const response = await fetch('http://localhost:3000/auth/login', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: values.username,
+          username: values.username,
           password: values.password,
         }),
       });
