@@ -1,15 +1,10 @@
 import styles from './header.module.css'
-import {
-  Button,
-  Dropdown,
-  type MenuProps,
-  Space,
-} from "antd";
-import {useState} from 'react';
-import {SettingOutlined} from '@ant-design/icons';
+import { Button, Dropdown, type MenuProps, Space } from "antd";
+import { useState } from 'react';
 import AuthPage from "../../pages/auth-page.tsx";
-import {useAuth} from "../../forms/authcontext.tsx";
-import type {Segment} from "../../types/auth.interface.ts";
+import { useAuth } from "../../forms/authcontext.tsx";
+import type { Segment } from "../../types/auth.interface.ts";
+import { useNavigate } from '@tanstack/react-router';
 
 function DownOutlined() {
   return null;
@@ -19,7 +14,8 @@ export const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [segment, setSegment] = useState<Segment>("login");
 
-  const {isAuth, logout} = useAuth();
+  const { isAuth, logout, login } = useAuth();
+  const navigate = useNavigate();
 
   const items: MenuProps['items'] = [
     {
@@ -27,27 +23,15 @@ export const Header = () => {
       label: 'My Account',
       disabled: true,
     },
-    {
-      type: 'divider',
-    },
-    {
-      key: '2',
-      label: 'Profile',
-    },
-    {
-      key: '3',
-      label: 'Billing',
-    },
-    {
-      key: '4',
-      label: 'Settings',
-      icon: <SettingOutlined/>,
-    },
+
     {
       key: '5',
       danger: true,
       label: 'Logout',
-      onClick: () => logout(),
+      onClick: () => {
+        logout();
+        navigate({ to: '/' });
+      },
     },
   ];
 
@@ -64,8 +48,14 @@ export const Header = () => {
     setIsModalOpen(false);
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (token: string) => {
     setIsModalOpen(false);
+
+    if (login) {
+      login(token);
+    }
+
+    navigate({ to: '/' });
   };
 
   return (
@@ -89,6 +79,7 @@ export const Header = () => {
             <li><a href="#services">Услуги</a></li>
             <li><a href="#contacts">Контакты</a></li>
           </ul>
+
           <div className={styles.auth}>
             {!isAuth ? (
               <>
@@ -105,11 +96,11 @@ export const Header = () => {
                 />
               </>
             ) : (
-              <Dropdown menu={{items}}>
+              <Dropdown menu={{ items }}>
                 <a onClick={(e) => e.preventDefault()}>
                   <Space>
                     Мой аккаунт
-                    <DownOutlined/>
+                    <DownOutlined />
                   </Space>
                 </a>
               </Dropdown>

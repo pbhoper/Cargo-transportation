@@ -5,7 +5,7 @@ import type { LoginTypes } from '../types/login.interface.ts';
 import { useAuth} from "./authcontext.tsx";
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (token: string) => void;
 }
 
 const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
@@ -36,7 +36,7 @@ const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
 
       message.success('Успешный вход');
 
-      onSuccess();
+      onSuccess(data.access_token);
     } catch (error) {
       console.error(error);
       message.error('Неверный логин или пароль');

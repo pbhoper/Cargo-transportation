@@ -16,8 +16,8 @@ export class TthEntity {
   @Column({ nullable: true })
   notes?: string;
 
-  @Column()
-  senderName: string;
+  @Column({ nullable: true })
+  senderName?: string;
 
   @Column()
   senderId: string;

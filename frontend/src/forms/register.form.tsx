@@ -12,7 +12,7 @@ const http = axios.create({
 })
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (token: string) => void;
 }
 
 const RegisterForm: FC<Props> = ({ onSuccess }): JSX.Element => {
@@ -20,30 +20,44 @@ const RegisterForm: FC<Props> = ({ onSuccess }): JSX.Element => {
     console.log('Success:', values);
 
     try {
-      const {data} = await http.post("auth/register", values);
+      const { data } = await http.post("auth/register", values);
       console.log('data', data);
-      onSuccess();
+
+      const token = data?.token || data?.accessToken;
+
+      if (token) {
+        onSuccess(token);
+      } else {
+        console.warn("Токен не найден в ответе сервера, но регистрация прошла.");
+
+        onSuccess("");
+      }
+
+      notification.success({
+        message: "Регистрация успешна!",
+        description: "Добро пожаловать в систему."
+      });
     } catch (error: unknown) {
       let errorMessage = "Неизвестная ошибка";
 
       if (error instanceof AxiosError) {
-        const responseErrorMessage = error.response?.data.message;
+        const responseErrorMessage = error.response?.data?.message;
 
         if (responseErrorMessage) {
-          errorMessage = (responseErrorMessage)
+          errorMessage = Array.isArray(responseErrorMessage)
             ? responseErrorMessage.join(", ")
-            : [responseErrorMessage];
+            : responseErrorMessage;
         } else if (error.message) {
           errorMessage = error.message;
         }
       }
+
       notification.error({
-        title: "Ошибка регистрации",
+        message: "Ошибка регистрации",
         description: errorMessage
       })
     }
   };
-
 
   return (
     <Form
@@ -100,7 +114,7 @@ const RegisterForm: FC<Props> = ({ onSuccess }): JSX.Element => {
         <Input />
       </Form.Item>
 
-      <Form.Item label={null}>
+      <Form.Item>
         <Flex justify="center" style={{ marginTop: '30px' }}>
           <Button type="primary" htmlType="submit">
             Submit

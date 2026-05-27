@@ -2,7 +2,7 @@ import {Modal, Segmented} from "antd";
 import LoginForm from "../forms/login.form.tsx";
 import RegisterForm from "../forms/register.form.tsx";
 import type {FC} from "react";
-import type {Segment} from "../interfaces/auth.interface.ts";
+import type {Segment} from "../types/auth.interface.ts";
 
 const options = [{label: "ВОЙТИ", value: "login"}, {label: "ЗАРЕГИСТРИРОВАТЬСЯ", value: "register"}];
 
@@ -11,7 +11,7 @@ interface IProps {
   isModalOpen: boolean;
   cancelModal: () => void;
   onChangeSegment: (value: Segment) => void;
-  onSuccess: () => void;
+  onSuccess: (token: string) => void;
 }
 
 const AuthPage: FC<IProps> = ({segment, isModalOpen, cancelModal, onChangeSegment, onSuccess}) => {
