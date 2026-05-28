@@ -1,4 +1,8 @@
-import { Injectable, ForbiddenException, UnauthorizedException, } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthEntity } from '../entity/auth.entity';
@@ -17,9 +21,7 @@ export class AuthService {
 
   async register(authDto: RegisterDto) {
     const candidate = await this.clientRepository.findOne({
-      where: {
-        email: authDto.email,
-      },
+      where: { email: authDto.email },
     });
 
     if (candidate) {
@@ -38,9 +40,7 @@ export class AuthService {
 
   async login(authDto: LoginDto) {
     const user = await this.clientRepository.findOne({
-      where: {
-        username: authDto.username,
-      },
+      where: { username: authDto.username },
     });
 
     if (!user) {
@@ -56,14 +56,26 @@ export class AuthService {
       throw new UnauthorizedException('Неверный пароль');
     }
 
-    const payload = {
-      id: user.id,
-      email: user.email,
-    };
+    const payload = { id: user.id, email: user.email };
 
     return {
       access_token: this.jwtService.sign(payload),
       user,
     };
+  }
+
+  async searchUsers(search?: string) {
+    const query = this.clientRepository.createQueryBuilder('user');
+
+    if (search && search.length >= 1) {
+      query.where(
+        'user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.username ILIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+
+    query.take(10);
+
+    return query.getMany();
   }
 }

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { SenderSelector } from "../types/sender.selector.tsx";
 
 export const Route = createFileRoute("/tth")({
   component: RouteComponent,
@@ -24,12 +25,20 @@ type TTH = {
   products: Product[];
 };
 
+type User = {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
 const today = new Date().toISOString().split("T")[0];
 
-const API_URL = "http://localhost:3000/tth"
+const API_URL = "http://localhost:3000/tth";
 
 const emptyForm: TTH = {
-  id: 0, 
+  id: 0,
   number: "",
   date: today,
   sender: "",
@@ -38,11 +47,12 @@ const emptyForm: TTH = {
   products: [],
 };
 
-function RouteComponent() { //eslint-disable-line
+function RouteComponent() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [tthList, setTthList] = useState<TTH[]>([]);
   const [form, setForm] = useState<TTH>(emptyForm);
+  const [sender, setSender] = useState<User | null>(null);
 
   const filtered = useMemo(() => {
     return tthList.filter((t) => {
@@ -74,8 +84,8 @@ function RouteComponent() { //eslint-disable-line
     const payload = {
       number: form.number,
       dateCreated: form.date,
-      senderName: form.sender,
-      senderId: "1",
+      senderName: sender ? `${sender.firstName} ${sender.lastName}` : form.sender,
+      senderId: sender ? String(sender.id) : "1",
       recipientId: "1",
       recipientName: form.receiver,
       vehicleId: "1",
@@ -101,7 +111,7 @@ function RouteComponent() { //eslint-disable-line
         id: data.id,
         number: data.number,
         date: data.dateCreated,
-        sender: data.senderName,
+        sender: payload.senderName,
         receiver: data.recipientName,
         status: "Оформлен",
         products: data.items || [],
@@ -109,6 +119,7 @@ function RouteComponent() { //eslint-disable-line
     ]);
 
     setForm(emptyForm);
+    setSender(null);
   };
 
   const addProduct = () => {
@@ -225,13 +236,9 @@ function RouteComponent() { //eslint-disable-line
               style={styles.input}
             />
 
-            <input
-              placeholder="Отправитель"
-              value={form.sender}
-              onChange={(e) =>
-                setForm({ ...form, sender: e.target.value })
-              }
-              style={styles.input}
+            <SenderSelector
+              onSelect={setSender}
+              value={sender}
             />
 
             <input
@@ -291,10 +298,10 @@ function RouteComponent() { //eslint-disable-line
 
           <div style={styles.actions}>
             <button onClick={saveTTH} style={styles.saveBtn}>
-               Сохранить
+              Сохранить
             </button>
 
-            <button onClick={() => setForm(emptyForm)} style={styles.clearBtn}>
+            <button onClick={() => { setForm(emptyForm); setSender(null); }} style={styles.clearBtn}>
               Очистить
             </button>
           </div>
