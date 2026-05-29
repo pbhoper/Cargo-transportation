@@ -17,6 +17,9 @@ export class TthEntity {
   notes?: string;
 
   @Column({ nullable: true })
+  userId?: number;
+
+  @Column({ nullable: true })
   senderName?: string;
 
   @Column()

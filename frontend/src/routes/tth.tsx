@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { SenderSelector } from "../types/sender.selector.tsx";
 
 export const Route = createFileRoute("/tth")({
@@ -53,13 +53,55 @@ function RouteComponent() {
   const [tthList, setTthList] = useState<TTH[]>([]);
   const [form, setForm] = useState<TTH>(emptyForm);
   const [sender, setSender] = useState<User | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUserId(payload.sub || payload.userId || payload.id);
+      } catch (e) {
+        console.error('Ошибка декодирования токена:', e);
+      }
+    }
+    loadTTH();
+  }, []);
+
+  const loadTTH = async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(API_URL, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+    });
+
+    if (!res.ok) {
+      console.error(`Ошибка загрузки: ${res.status}`);
+      return;
+    }
+
+    const data = await res.json();
+
+    setTthList(data.map((t: any) => ({
+      id: t.id,
+      number: t.number || "",
+      date: t.dateCreated,
+      sender: t.senderName || "",
+      receiver: t.recipientName || "",
+      status: "Оформлен" as Status,
+      products: t.items || [],
+    })));
+  };
 
   const filtered = useMemo(() => {
     return tthList.filter((t) => {
-      const q =
-        t.number.toLowerCase().includes(search.toLowerCase()) ||
-        t.sender.toLowerCase().includes(search.toLowerCase()) ||
-        t.receiver.toLowerCase().includes(search.toLowerCase());
+      const q = search
+        ? (t.number || '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.sender || '').toLowerCase().includes(search.toLowerCase()) ||
+        (t.receiver || '').toLowerCase().includes(search.toLowerCase())
+        : true;
 
       const s = statusFilter ? t.status === statusFilter : true;
 
@@ -81,11 +123,16 @@ function RouteComponent() {
   const saveTTH = async () => {
     if (!form.number.trim()) return alert("Введите номер");
 
+    if (!userId) {
+      alert("Ошибка: пользователь не авторизован");
+      return;
+    }
+
     const payload = {
       number: form.number,
       dateCreated: form.date,
       senderName: sender ? `${sender.firstName} ${sender.lastName}` : form.sender,
-      senderId: sender ? String(sender.id) : "1",
+      senderId: sender ? String(sender.id) : String(userId),
       recipientId: "1",
       recipientName: form.receiver,
       vehicleId: "1",
@@ -97,11 +144,20 @@ function RouteComponent() {
       items: form.products,
     };
 
+    const token = localStorage.getItem('token');
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(payload),
     });
+
+    if (!res.ok) {
+      alert(`Ошибка: ${res.status} ${res.statusText}`);
+      return;
+    }
 
     const data = await res.json();
 
@@ -109,7 +165,7 @@ function RouteComponent() {
       ...prev,
       {
         id: data.id,
-        number: data.number,
+        number: data.number || form.number,
         date: data.dateCreated,
         sender: payload.senderName,
         receiver: data.recipientName,
@@ -120,6 +176,7 @@ function RouteComponent() {
 
     setForm(emptyForm);
     setSender(null);
+    loadTTH();
   };
 
   const addProduct = () => {
@@ -319,23 +376,19 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     fontFamily: "Arial",
   },
-
   container: {
     maxWidth: 1100,
     margin: "0 auto",
   },
-
   title: {
     fontSize: 28,
     marginBottom: 20,
   },
-
   filters: {
     display: "flex",
     gap: 10,
     marginBottom: 20,
   },
-
   input: {
     flex: 1,
     padding: 10,
@@ -344,39 +397,33 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#1e293b",
     color: "white",
   },
-
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
     gap: 15,
     marginBottom: 30,
   },
-
   card: {
     background: "#1e293b",
     padding: 15,
     borderRadius: 12,
     border: "1px solid #334155",
   },
-
   cardTop: {
     display: "flex",
     justifyContent: "space-between",
     marginBottom: 10,
   },
-
   badge: {
     padding: "4px 10px",
     borderRadius: 20,
     fontSize: 12,
     color: "white",
   },
-
   row: {
     marginBottom: 5,
     fontSize: 14,
   },
-
   editBtn: {
     marginTop: 10,
     width: "100%",
@@ -387,41 +434,35 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     cursor: "pointer",
   },
-
   form: {
     background: "#1e293b",
     padding: 20,
     borderRadius: 12,
     border: "1px solid #334155",
   },
-
   formGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: 10,
     marginBottom: 15,
   },
-
   productsHeader: {
     display: "flex",
     justifyContent: "space-between",
     marginTop: 10,
     marginBottom: 10,
   },
-
   productRow: {
     display: "grid",
     gridTemplateColumns: "2fr 1fr 1fr auto",
     gap: 10,
     marginBottom: 10,
   },
-
   actions: {
     display: "flex",
     gap: 10,
     marginTop: 15,
   },
-
   saveBtn: {
     flex: 1,
     padding: 10,
@@ -431,7 +472,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     cursor: "pointer",
   },
-
   clearBtn: {
     flex: 1,
     padding: 10,
@@ -441,7 +481,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "white",
     cursor: "pointer",
   },
-
   addBtn: {
     padding: "6px 12px",
     background: "#10b981",
@@ -449,7 +488,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     color: "white",
   },
-
   deleteBtn: {
     background: "#ef4444",
     border: "none",

@@ -12,42 +12,51 @@ export class TthService {
     private readonly tthRepository: Repository<TthEntity>,
   ) {}
 
-  async create(createTthDto: CreateTthDto): Promise<TthEntity> {
-    const newTth = this.tthRepository.create(createTthDto);
+  async create(createTthDto: CreateTthDto, userId: number): Promise<TthEntity> {
+    console.log('CreateTthDto:', JSON.stringify(createTthDto, null, 2));
+    console.log('userId:', userId);
+
+    const newTth = this.tthRepository.create({
+      ...createTthDto,
+      userId,
+    });
     return await this.tthRepository.save(newTth);
   }
 
-  async findAll(): Promise<TthEntity[]> {
-    return await this.tthRepository.find();
+  async findAll(userId: number): Promise<TthEntity[]> {
+    return await this.tthRepository.find({ where: { userId } });
   }
 
-  async findOne(id: number): Promise<TthEntity> {
-    const tth = await this.tthRepository.findOne({ where: { id } });
+  async findOne(id: number, userId: number): Promise<TthEntity> {
+    const tth = await this.tthRepository.findOne({
+      where: { id, userId },
+    });
     if (!tth) {
-      throw new NotFoundException(`ТТН с ID ${id} не найдена`);
+      throw new NotFoundException(
+        `ТТН с ID ${id} не найдена или не принадлежит вам`,
+      );
     }
     return tth;
   }
 
-  async searchNumber(tthNumber: number): Promise<TthEntity[]> {
+  async searchNumber(number: string, userId: number): Promise<TthEntity[]> {
     return await this.tthRepository.find({
-      where: { number: String(tthNumber) },
+      where: { number, userId },
     });
   }
 
-  async update(id: number, updateTthDto: TthUpdateDto): Promise<TthEntity> {
-    await this.findOne(id);
-
+  async update(
+    id: number,
+    updateTthDto: TthUpdateDto,
+    userId: number,
+  ): Promise<TthEntity> {
+    await this.findOne(id, userId);
     await this.tthRepository.update(id, updateTthDto);
-
-    return this.findOne(id);
+    return this.findOne(id, userId);
   }
 
-  async remove(id: number): Promise<void> {
-    const result = await this.tthRepository.findOne({ where: { id } });
-    if (!result) {
-      throw new NotFoundException('ТТН не найден или был удален');
-    }
-    await this.tthRepository.softRemove(result);
+  async remove(id: number, userId: number): Promise<void> {
+    const tth = await this.findOne(id, userId);
+    await this.tthRepository.softRemove(tth);
   }
 }

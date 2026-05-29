@@ -4,7 +4,6 @@ import {
   IsArray,
   ValidateNested,
   IsDateString,
-  IsNotEmpty,
   IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -80,5 +79,6 @@ export class CreateTthDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => TthItemDto)
-  items: TthItemDto[];
+  @IsOptional()
+  items?: TthItemDto[];
 }
