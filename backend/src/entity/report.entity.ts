@@ -13,4 +13,7 @@ export class ReportEntity {
 
   @Column({ nullable: true })
   clientId?: string;
+
+  @Column({ nullable: true })
+  userId: number;
 }

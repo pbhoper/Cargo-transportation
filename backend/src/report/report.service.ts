@@ -4,13 +4,16 @@ import * as ExcelJS from 'exceljs';
 import type { Response } from 'express';
 import { Repository } from 'typeorm';
 import { ReportDto } from '../dto/report-dto';
-import { ReportEntity} from '../entity/report.entity';
+import { ReportEntity } from '../entity/report.entity';
+import { TthEntity } from '../entity/tth.entity';
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectRepository(ReportEntity)
     private readonly reportRepository: Repository<ReportEntity>,
+    @InjectRepository(TthEntity)
+    private readonly tthRepository: Repository<TthEntity>,
   ) {}
 
   private createWorkbook(): ExcelJS.Workbook {
@@ -59,18 +62,26 @@ export class ReportService {
     res.end();
   }
 
-  private async saveReportQuery(query: ReportDto) {
+  private async saveReportQuery(query: ReportDto, userId: number) {
     await this.reportRepository.save({
       startDate: query.startDate,
       endDate: query.endDate,
       clientId: query.clientId,
+      userId,
     });
   }
-  async generateWaybillsReport(query: ReportDto, res: Response) {
-    await this.saveReportQuery(query);
+
+  async generateWaybillsReport(query: ReportDto, res: Response, userId: number) {
+
+    await this.saveReportQuery(query, userId);
+
+    const ttns = await this.tthRepository.find({
+      where: {
+        userId,
+      },
+    });
 
     const workbook = this.createWorkbook();
-
     const sheet = workbook.addWorksheet('waybills');
 
     sheet.columns = [
@@ -83,18 +94,27 @@ export class ReportService {
       { header: 'Departure Date', key: 'date', width: 15 },
     ];
 
-    sheet.addRows([]);
+    sheet.addRows(
+      ttns.map((t) => ({
+        id: t.id,
+        ttn: t.number || '',
+        sender: t.senderName || '',
+        receiver: t.recipientName || '',
+        car: t.vehicleBrandModel || '',
+        driver: t.driverFullName || '',
+        date: t.dateCreated,
+      })),
+    );
 
     this.styleSheet(sheet);
 
     await this.finalizeResponse(workbook, res, 'waybills-report');
   }
 
-  async generateLossesReport(query: ReportDto, res: Response) {
-    await this.saveReportQuery(query);
+  async generateLossesReport(query: ReportDto, res: Response, userId: number) {
+    await this.saveReportQuery(query, userId);
 
     const workbook = this.createWorkbook();
-
     const sheet = workbook.addWorksheet('losses');
 
     sheet.columns = [
@@ -114,11 +134,10 @@ export class ReportService {
     await this.finalizeResponse(workbook, res, 'losses-report');
   }
 
-  async generateLossesByDriverReport(query: ReportDto, res: Response) {
-    await this.saveReportQuery(query);
+  async generateLossesByDriverReport(query: ReportDto, res: Response, userId: number) {
+    await this.saveReportQuery(query, userId);
 
     const workbook = this.createWorkbook();
-
     const sheet = workbook.addWorksheet('losses-by-driver');
 
     sheet.columns = [
@@ -133,11 +152,10 @@ export class ReportService {
     await this.finalizeResponse(workbook, res, 'losses-by-driver');
   }
 
-  async generateProfitReport(query: ReportDto, res: Response) {
-    await this.saveReportQuery(query);
+  async generateProfitReport(query: ReportDto, res: Response, userId: number) {
+    await this.saveReportQuery(query, userId);
 
     const workbook = this.createWorkbook();
-
     const sheet = workbook.addWorksheet('profit');
 
     sheet.columns = [
@@ -154,11 +172,10 @@ export class ReportService {
     await this.finalizeResponse(workbook, res, 'profit-report');
   }
 
-  async generateClientStatsReport(query: ReportDto, res: Response) {
-    await this.saveReportQuery(query);
+  async generateClientStatsReport(query: ReportDto, res: Response, userId: number) {
+    await this.saveReportQuery(query, userId);
 
     const workbook = this.createWorkbook();
-
     const sheet = workbook.addWorksheet('client-statistics');
 
     sheet.columns = [

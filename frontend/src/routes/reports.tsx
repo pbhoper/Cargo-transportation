@@ -94,8 +94,9 @@ function RouteComponent() { //eslint-disable-line
       const [start, end] = dates;
       const startDate = start.format('YYYY-MM-DD');
       const endDate = end.format('YYYY-MM-DD');
-      const response = await axios.get(
 
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
         `${API_URL}${reportType}`,
         {
           params: {
@@ -105,9 +106,13 @@ function RouteComponent() { //eslint-disable-line
             page,
             limit,
           },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
           responseType: 'blob',
         },
       );
+
 
       const blob = new Blob([response.data], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

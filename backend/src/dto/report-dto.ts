@@ -1,4 +1,8 @@
-import {IsDateString, IsOptional, IsString} from "class-validator";
+import { IsDateString,
+  IsNumber,
+  IsOptional,
+  IsString
+} from 'class-validator';
 
 
 export class ReportDto {
@@ -11,4 +15,8 @@ export class ReportDto {
   @IsOptional()
   @IsString()
   clientId: string;
+
+  @IsOptional()
+  @IsNumber()
+  userId?: number;
 }
