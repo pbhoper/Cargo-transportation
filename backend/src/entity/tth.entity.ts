@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { TthEnum } from '../enum/tth.enum';
 import { TthItemDto } from '../dto/tth.item-dto';
+import { WaybillEntity } from './waybill.entity';
 
 @Entity('tth')
 export class TthEntity {
@@ -18,6 +19,9 @@ export class TthEntity {
 
   @Column({ nullable: true })
   userId?: number;
+
+  @ManyToMany(() => WaybillEntity, (waybill) => waybill.tths)
+  waybills: WaybillEntity[];
 
   @Column({ nullable: true })
   senderName?: string;

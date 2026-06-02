@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { TthEntity } from './tth.entity';
 
 @Entity()
 export class WaybillEntity {
@@ -8,6 +15,7 @@ export class WaybillEntity {
   @Column()
   title: string;
 
-  @Column()
-  ttn: string;
+  @ManyToMany(() => TthEntity, (tth) => tth.waybills, { cascade: true })
+  @JoinTable()
+  tths: TthEntity[];
 }

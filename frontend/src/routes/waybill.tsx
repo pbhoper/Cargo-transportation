@@ -8,66 +8,128 @@ export const Route = createFileRoute("/waybill")({
 type Waybill = {
   id: number;
   title: string;
-  ttn: string;
+  tths: TTH[];
 };
 
-// TODO: rewrite !
-const API_URL = "http://localhost:3000/waybill";
+type TTH = {
+  id: number;
+  number: string;
+  dateCreated: string;
+};
 
-function RouteComponent() { //eslint-disable-line
+const API_URL = "http://localhost:3000/waybill";
+const TTH_API_URL = "http://localhost:3000/tth";
+
+function RouteComponent() {
   const [sheets, setSheets] = useState<Waybill[]>([]);
+  const [tthList, setTthList] = useState<TTH[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const [form, setForm] = useState({
     title: "",
-    ttn: "",
+    tthIds: [] as number[],
   });
 
   const load = async () => {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    setSheets(data);
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('Токен не найден');
+      setSheets([]);
+      setTthList([]);
+      return;
+    }
+
+    try {
+      console.log('Token:', token);
+
+      const res = await fetch(API_URL, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      console.log('Waybill response status:', res.status);
+
+      if (!res.ok) {
+        console.error(`Ошибка загрузки путевых листов: ${res.status}`);
+        setSheets([]);
+      } else {
+        const data = await res.json();
+        console.log('Waybill data:', data);
+        setSheets(Array.isArray(data) ? data : []);
+      }
+
+      const tthRes = await fetch(TTH_API_URL, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      console.log('TTH response status:', tthRes.status);
+
+      if (tthRes.ok) {
+        const tthData = await tthRes.json();
+        console.log('TTH data:', tthData);
+        setTthList(Array.isArray(tthData) ? tthData : []);
+      } else {
+        const errorText = await tthRes.text();
+        console.error(`Ошибка загрузки ТТН: ${tthRes.status}`, errorText);
+        setTthList([]);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке:', error);
+      setSheets([]);
+      setTthList([]);
+    }
   };
 
-  useEffect(() => {
-    load(); //eslint-disable-line
-  }, []);
+  useEffect(() => {load();},[]);
 
   const reset = () => {
-    setForm({ title: "", ttn: "" });
+    setForm({ title: "", tthIds: [] });
     setEditingId(null);
   };
 
   const save = async () => {
+    const token = localStorage.getItem('token');
     if (editingId) {
-      // TODO: вынести
       await fetch(`${API_URL}/${editingId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(form),
       });
     } else {
       await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(form),
       });
     }
-
     reset();
     load();
   };
 
   const edit = (s: Waybill) => {
-    setForm({ title: s.title, ttn: s.ttn });
+    setForm({title: s.title, tthIds: s.tths.map(t => t.id),});
     setEditingId(s.id);
   };
 
   const remove = async (id: number) => {
+    const token = localStorage.getItem('token');
     await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
+      headers: { 'Authorization': `Bearer ${token}` },
     });
     load();
+  };
+
+  const toggleTth = (tthId: number) => {
+    setForm(prev => ({...prev, tthIds: prev.tthIds.includes(tthId) ? prev.tthIds.filter(id => id !== tthId)
+        :[...prev.tthIds, tthId],
+    }));
   };
 
   return (
@@ -88,7 +150,9 @@ function RouteComponent() { //eslint-disable-line
             <div className="card" key={s.id}>
               <div>
                 <div className="title">{s.title}</div>
-                <div className="meta">ТТН: {s.ttn}</div>
+                <div className="meta">
+                  ТТН: {s.tths.map(t => t.number).join(', ') || 'Нет'}
+                </div>
               </div>
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -114,13 +178,42 @@ function RouteComponent() { //eslint-disable-line
             }
           />
 
-          <input
-            placeholder="ТТН"
-            value={form.ttn}
-            onChange={(e) =>
-              setForm({ ...form, ttn: e.target.value })
-            }
-          />
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ display: 'block', marginBottom: 5 }}>Выберите ТТН:</div>
+            <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10 }}>
+              {tthList.map((tth) => {
+                const isChecked = form.tthIds.includes(tth.id);
+                return (
+                  <div
+                    key={tth.id}
+                    onClick={() => toggleTth(tth.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      marginBottom: 5,
+                      cursor: 'pointer',
+                      padding: '5px',
+                      background: isChecked ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
+                      borderRadius: 5,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        toggleTth(tth.id);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ cursor: 'pointer', width: 'auto', pointerEvents: 'none' }}
+                    />
+                    <span>#{tth.number} ({tth.dateCreated})</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           <div className="actions">
             <button className="btn primary" onClick={save}>

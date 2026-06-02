@@ -1,11 +1,13 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsArray, IsNumber, Min } from 'class-validator';
 
 export class WaybillUpdatedDto {
   @IsString()
   @IsOptional()
   title?: string;
 
-  @IsString()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  @Min(1, { each: true })
   @IsOptional()
-  ttn?: string;
+  tthIds?: number[];
 }
