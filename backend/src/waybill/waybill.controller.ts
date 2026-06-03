@@ -23,26 +23,30 @@ export class WaybillController {
 
   @Post()
   create(@Body() dto: WaybillDto, @Request() req): Promise<WaybillEntity> {
-    return this.service.create(dto);
+    return this.service.create(dto, req);
   }
 
   @Get()
   findAll(@Request() req): Promise<WaybillEntity[]> {
-    return this.service.findAll();
+    return this.service.findAll(req);
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.service.findOne(id);
+    return this.service.findOne(id, req);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: WaybillUpdatedDto, @Request() req,) {
-    return this.service.update(id, dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: WaybillUpdatedDto,
+    @Request() req,
+  ) {
+    return this.service.update(id, dto, req);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.service.remove(id);
+    return this.service.remove(id, req);
   }
 }

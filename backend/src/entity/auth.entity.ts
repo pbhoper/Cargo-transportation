@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany
+} from 'typeorm';
+import { WaybillEntity } from './waybill.entity';
 
 @Entity('clients')
 export class AuthEntity {
@@ -19,4 +25,7 @@ export class AuthEntity {
 
   @Column()
   lastName: string;
+
+  @OneToMany(() => WaybillEntity, (waybill) => waybill.user)
+  waybills: WaybillEntity[];
 }
