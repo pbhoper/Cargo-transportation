@@ -48,27 +48,18 @@ export class WarehousesService {
 
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.warehouseRepository.findAndCount({
-      skip,
-      take: limit,
-      order: {
+    const [data, total] = await this.warehouseRepository.findAndCount({ skip, take: limit, order: {
         createdAt: 'DESC',
       },
     });
 
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit),
       },
     };
   }
 
   async findOne(id: number): Promise<WarehousesEntity> {
-    const warehouse = await this.warehouseRepository.findOneBy({ id });
+    const warehouse = await this.warehouseRepository.findOneBy({id});
 
     if (!warehouse) {
       throw new NotFoundException(`Склад ${id} не найден`);
@@ -77,24 +68,16 @@ export class WarehousesService {
     return warehouse;
   }
 
-  async update(
-    id: number,
-    updateDto: Partial<WarehouseDto>,
-  ): Promise<WarehousesEntity> {
+  async update(id: number, updateDto: Partial<WarehouseDto>,): Promise<WarehousesEntity> {
     const warehouse = await this.findOne(id);
 
-    const updatedWarehouse = this.warehouseRepository.create({
-      ...warehouse,
-      ...updateDto,
-    });
+    const updatedWarehouse = this.warehouseRepository.create({...warehouse, ...updateDto,});
 
     return this.warehouseRepository.save(updatedWarehouse);
   }
 
   async remove(id: number): Promise<void> {
-    const warehouse = await this.warehouseRepository.findOne({
-      where: { id },
-    });
+    const warehouse = await this.warehouseRepository.findOne({where: { id },});
 
     if (!warehouse) {
       throw new NotFoundException('Склад не найден');
