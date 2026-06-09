@@ -8,8 +8,14 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    env_file:
-      - ./backend/.env
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=cargo
+      - DB_PASSWORD=cargo123
+      - DB_DATABASE=cargo
+      - DB_NAME=cargo
     depends_on:
       db:
         condition: service_healthy
