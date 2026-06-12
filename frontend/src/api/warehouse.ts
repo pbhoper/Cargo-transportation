@@ -4,7 +4,7 @@ const API_URL = "http://localhost:3000/warehouses";
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 10000,
+  timeout: 10_000,
   headers: {
     'Content-Type': 'application/json',
   },
