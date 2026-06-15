@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TthEntity } from '../entity/tth.entity';
@@ -13,50 +17,60 @@ export class TthService {
   ) {}
 
   async create(createTthDto: CreateTthDto, userId: number): Promise<TthEntity> {
-    console.log('CreateTthDto:', JSON.stringify(createTthDto, null, 2));
-    console.log('userId:', userId);
-
-    const newTth = this.tthRepository.create({
-      ...createTthDto,
-      userId,
-    });
-    return await this.tthRepository.save(newTth);
+    const newTth = this.tthRepository.create({ ...createTthDto, userId });
+    return this.tthRepository.save(newTth);
   }
 
-  async findAll(userId: number): Promise<TthEntity[]> {
-    return await this.tthRepository.find({ where: { userId } });
+  async findAll(userId: number, role: string): Promise<TthEntity[]> {
+    if (role === 'admin') {
+      return this.tthRepository.find();
+    }
+    return this.tthRepository.find({ where: { userId } });
   }
 
-  async findOne(id: number, userId: number): Promise<TthEntity> {
-    const tth = await this.tthRepository.findOne({
-      where: { id, userId },
-    });
+  async findOne(id: number, userId: number, role: string): Promise<TthEntity> {
+    const tth =
+      role === 'admin'
+        ? await this.tthRepository.findOne({ where: { id } })
+        : await this.tthRepository.findOne({ where: { id, userId } });
+
     if (!tth) {
-      throw new NotFoundException(
-        `ТТН с ID ${id} не найдена или не принадлежит вам`,
-      );
+      throw new NotFoundException('Нет доступа');
     }
     return tth;
   }
 
-  async searchNumber(number: string, userId: number): Promise<TthEntity[]> {
-    return await this.tthRepository.find({
-      where: { number, userId },
-    });
+  async searchNumber(
+    number: string,
+    userId: number,
+    role: string,
+  ): Promise<TthEntity[]> {
+    if (role === 'admin') {
+      return this.tthRepository.find({ where: { number } });
+    }
+    return this.tthRepository.find({ where: { number, userId } });
   }
 
   async update(
     id: number,
     updateTthDto: TthUpdateDto,
     userId: number,
+    role: string,
   ): Promise<TthEntity> {
-    await this.findOne(id, userId);
+    const tth = await this.findOne(id, userId, role);
+
+    if (role !== 'admin' && tth.userId !== userId) {
+      throw new ForbiddenException('Нет доступа');
+    }
     await this.tthRepository.update(id, updateTthDto);
-    return this.findOne(id, userId);
+    return this.findOne(id, userId, role);
   }
 
-  async remove(id: number, userId: number): Promise<void> {
-    const tth = await this.findOne(id, userId);
+  async remove(id: number, userId: number, role: string): Promise<void> {
+    const tth = await this.findOne(id, userId, role);
+    if (role !== 'admin' && tth.userId !== userId) {
+      throw new ForbiddenException('Нет доступа');
+    }
     await this.tthRepository.softRemove(tth);
   }
 }

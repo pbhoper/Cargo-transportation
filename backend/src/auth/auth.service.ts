@@ -2,14 +2,15 @@ import {
   Injectable,
   ForbiddenException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthEntity } from '../entity/auth.entity';
 import { RegisterDto } from '../dto/register-dto';
+import { LoginDto } from '../dto/login-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from '../dto/login-dto';
 
 @Injectable()
 export class AuthService {
@@ -33,6 +34,7 @@ export class AuthService {
     const user = this.clientRepository.create({
       ...authDto,
       password: hashedPassword,
+      roles: 'user',
     });
 
     return this.clientRepository.save(user);
@@ -59,6 +61,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
+      role: user.roles,
     };
 
     return {
@@ -80,5 +83,17 @@ export class AuthService {
     query.take(10);
 
     return query.getMany();
+  }
+
+  async changeUserRole(id: number, role: 'user' | 'admin') {
+    const user = await this.clientRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    user.roles = role;
+
+    return this.clientRepository.save(user);
   }
 }

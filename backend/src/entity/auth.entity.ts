@@ -28,4 +28,7 @@ export class AuthEntity {
 
   @OneToMany(() => WaybillEntity, (waybill) => waybill.user)
   waybills: WaybillEntity[];
+
+  @Column({type: "enum", enum: ['user', 'admin'], default: 'user'})
+  roles: 'user' | 'admin';
 }

@@ -1,4 +1,3 @@
-import { TthService } from './tth.service';
 import {
   Body,
   Controller,
@@ -11,39 +10,38 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { TthService } from './tth.service';
 import { CreateTthDto } from '../dto/tth.create-dto';
 import { TthUpdateDto } from '../dto/tth.update-dto';
-import { JwtAuthGuard} from '../auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
 @Controller('tth')
 @UseGuards(JwtAuthGuard)
 export class TthController {
-  constructor(private tthService: TthService) {}
+  constructor(private readonly tthService: TthService) {}
 
   @Post()
   create(@Body() createTthDto: CreateTthDto, @Request() req) {
-    return this.tthService.create(
-      createTthDto,
-      req.user.sub || req.user.userId,
-    );
+    const userId = req.user.sub || req.user.userId;
+    return this.tthService.create(createTthDto, userId);
   }
 
   @Get()
   findAll(@Request() req) {
-    return this.tthService.findAll(req.user.sub || req.user.userId);
+    const { sub: userId, role } = req.user;
+    return this.tthService.findAll(userId, role);
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.tthService.findOne(id, req.user.sub || req.user.userId);
+    const { sub: userId, role } = req.user;
+    return this.tthService.findOne(id, userId, role);
   }
 
   @Get('number/:number')
-  findNumber(@Param('number', ParseIntPipe) number: number, @Request() req) {
-    return this.tthService.searchNumber(
-      String(number),
-      req.user.sub || req.user.userId,
-    );
+  findNumber(@Param('number') number: string, @Request() req) {
+    const { sub: userId, role } = req.user;
+    return this.tthService.searchNumber(number, userId, role);
   }
 
   @Patch(':id')
@@ -52,15 +50,13 @@ export class TthController {
     @Body() updateTthDto: TthUpdateDto,
     @Request() req,
   ) {
-    return this.tthService.update(
-      id,
-      updateTthDto,
-      req.user.sub || req.user.userId,
-    );
+    const { sub: userId, role } = req.user;
+    return this.tthService.update(id, updateTthDto, userId, role);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.tthService.remove(id, req.user.sub || req.user.userId);
+    const { sub: userId, role } = req.user;
+    return this.tthService.remove(id, userId, role);
   }
 }
