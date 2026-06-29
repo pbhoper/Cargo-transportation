@@ -17,8 +17,8 @@ type TTH = {
   dateCreated: string;
 };
 
-const API_URL = "http://localhost:3000/waybill";
-const TTH_API_URL = "http://localhost:3000/tth";
+const API_URL = import.meta.env.VITE_WAYBILL_URL;
+const TTH_API_URL = import.meta.env.VITE_TTH_URL;
 
 function RouteComponent() {
   const [sheets, setSheets] = useState<Waybill[]>([]);

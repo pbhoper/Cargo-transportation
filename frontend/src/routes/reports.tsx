@@ -31,7 +31,7 @@ type ReportType =
   | 'losses-by-driver'
   | 'profit';
 
-const API_URL = "http://localhost:3000/report/"
+const API_URL = import.meta.env.VITE_REPORTS_URL
 
 const reportOptions = [
   {label: 'Путевые листы', value: 'waybill'},

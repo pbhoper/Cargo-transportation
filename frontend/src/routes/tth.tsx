@@ -35,7 +35,7 @@ type User = {
 
 const today = new Date().toISOString().split("T")[0];
 
-const API_URL = "http://localhost:3000/tth";
+const API_URL = import.meta.env.VITE_TTH_URL;
 
 const emptyForm: TTH = {
   id: 0,

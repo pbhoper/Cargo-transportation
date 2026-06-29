@@ -16,7 +16,7 @@ import { WriteOffModule } from './writeoff/writeoff.module';
 import { WaybillModule } from './waybill/waybill.module';
 import { UsersModule } from './users/users.module';
 import { GoodsModule } from './goods/goods.module';
-import { typeormDataSourceOptions } from './typeorm-config';
+import { dataSourceOptions } from './typeorm-config';
 
 @Module({
   controllers: [
@@ -28,10 +28,8 @@ import { typeormDataSourceOptions } from './typeorm-config';
   ],
   providers: [AppService],
   imports: [
-
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot(typeormDataSourceOptions),
-
+    TypeOrmModule.forRoot(dataSourceOptions),
     TthModule,
     WarehousesModule,
     AuthModule,

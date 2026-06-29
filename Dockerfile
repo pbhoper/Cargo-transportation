@@ -12,7 +12,7 @@ COPY ./backend/package*.json ./
 RUN npm install --only=production && npm install @nestjs/swagger @nestjs/mapped-types exceljs
 COPY --from=backend-builder /app/backend/dist ./dist
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
 
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend

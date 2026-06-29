@@ -3,7 +3,7 @@ import type {FC, JSX} from "react";
 import type {RegisterTypes} from "../types/register.interface.ts";
 import axios, { AxiosError } from "axios";
 
-const API_URL = "http://localhost:3000/"
+const API_URL = import.meta.env.VITE_HOME_URL
 
 const http = axios.create({
   baseURL: API_URL,
