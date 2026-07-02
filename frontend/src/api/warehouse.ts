@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_WAREHOUSE_URL;
+const API_URL = "http://localhost:3000/warehouses";
 
 const apiClient = axios.create({
   baseURL: API_URL,

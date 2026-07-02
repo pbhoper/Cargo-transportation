@@ -11,7 +11,7 @@ interface Props {
 const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
   const { login } = useAuth();
 
-  const API_URL = import.meta.env.VITE_LOGIN_URL
+  const API_URL = "http://localhost:3000/auth/login"
 
   const handleFinish: FormProps<LoginTypes>['onFinish'] = async (values) => {
     try {

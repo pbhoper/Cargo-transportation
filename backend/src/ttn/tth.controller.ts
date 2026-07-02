@@ -45,11 +45,7 @@ export class TthController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateTthDto: TthUpdateDto,
-    @Request() req,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateTthDto: TthUpdateDto, @Request() req,) {
     const { sub: userId, role } = req.user;
     return this.tthService.update(id, updateTthDto, userId, role);
   }

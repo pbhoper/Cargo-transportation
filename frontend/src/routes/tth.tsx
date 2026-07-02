@@ -35,7 +35,7 @@ type User = {
 
 const today = new Date().toISOString().split("T")[0];
 
-const API_URL = import.meta.env.VITE_TTH_URL;
+const API_URL = "http://localhost:3000/tth";
 
 const emptyForm: TTH = {
   id: 0,
@@ -54,6 +54,9 @@ function RouteComponent() {
   const [form, setForm] = useState<TTH>(emptyForm);
   const [sender, setSender] = useState<User | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTth, setEditingTth] = useState<TTH>(emptyForm);
+  const [editSender, setEditSender] = useState<User | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -90,7 +93,7 @@ function RouteComponent() {
       date: t.dateCreated,
       sender: t.senderName || "",
       receiver: t.recipientName || "",
-      status: "Оформлен" as Status,
+      status: t.status || "Оформлен",
       products: t.items || [],
     })));
   };
@@ -142,7 +145,7 @@ function RouteComponent() {
       driverFullName: "N/A",
       driverPassport: "N/A",
       items: form.products,
-    };
+    }
 
     const token = localStorage.getItem('token');
     const res = await fetch(API_URL, {
@@ -177,6 +180,49 @@ function RouteComponent() {
     setForm(emptyForm);
     setSender(null);
     loadTTH();
+  };
+
+  const updateTTH = async () => {
+    if (!editingTth.number.trim()) return alert("Введите номер");
+
+    const payload = {
+      number: editingTth.number,
+      dateCreated: editingTth.date,
+      senderName: editSender ? `${editSender.firstName} ${editSender.lastName}` : editingTth.sender,
+      senderId: editSender ? String(editSender.id) : String(userId),
+      recipientId: "1",
+      recipientName: editingTth.receiver,
+      vehicleId: "1",
+      vehicleBrandModel: "N/A",
+      vehicleLicensePlate: "N/A",
+      driverId: "1",
+      driverFullName: "N/A",
+      driverPassport: "N/A",
+    };
+
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_URL}/${editingTth.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      alert(`Ошибка обновления: ${res.status}`);
+      return;
+    }
+
+    setIsModalOpen(false);
+    loadTTH();
+  };
+
+  const handleEditClick = (tth: TTH) => {
+    setEditingTth(tth);
+    setEditSender(tth.sender ? { firstName: tth.sender.split(' ')[0], lastName: tth.sender.split(' ')[1] || '' } as User : null);
+    setIsModalOpen(true);
   };
 
   const addProduct = () => {
@@ -262,7 +308,7 @@ function RouteComponent() {
               </div>
 
               <button
-                onClick={() => setForm(t)}
+                onClick={() => handleEditClick(t)}
                 style={styles.editBtn}
               >
                 Редактировать
@@ -272,7 +318,8 @@ function RouteComponent() {
         </div>
 
         <div style={styles.form}>
-          <h2>Создание / редактирование</h2>
+          <h2>Создание ТТН</h2>
+
 
           <div style={styles.formGrid}>
             <input
@@ -364,6 +411,47 @@ function RouteComponent() {
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h2>Редактирование ТТН #{editingTth.number}</h2>
+
+            <div style={styles.formGrid}>
+              <input
+                placeholder="Номер"
+                value={editingTth.number}
+                onChange={(e) => setEditingTth({ ...editingTth, number: e.target.value })}
+                style={styles.input}
+              />
+
+              <input
+                type="date"
+                value={editingTth.date}
+                onChange={(e) => setEditingTth({ ...editingTth, date: e.target.value })}
+                style={styles.input}
+              />
+
+              <SenderSelector
+                onSelect={setEditSender}
+                value={editSender}
+              />
+
+              <input
+                placeholder="Получатель"
+                value={editingTth.receiver}
+                onChange={(e) => setEditingTth({ ...editingTth, receiver: e.target.value })}
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.actions}>
+              <button onClick={updateTTH} style={styles.saveBtn}>Сохранить изменения</button>
+              <button onClick={() => setIsModalOpen(false)} style={styles.clearBtn}>Отмена</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -494,5 +582,27 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8,
     color: "white",
     padding: "0 10px",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  modalContent: {
+    background: "#1e293b",
+    padding: 30,
+    borderRadius: 12,
+    border: "1px solid #334155",
+    width: "100%",
+    maxWidth: "600px",
+    maxHeight: "85vh",
+    overflowY: "auto",
   },
 };
