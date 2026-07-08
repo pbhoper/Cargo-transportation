@@ -11,6 +11,7 @@ import { RegisterDto } from '../dto/register-dto';
 import { LoginDto } from '../dto/login-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -95,5 +96,63 @@ export class AuthService {
     user.roles = role;
 
     return this.clientRepository.save(user);
+  }
+
+  async requestPasswordReset(email: string) {
+    const user = await this.clientRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+
+      throw new NotFoundException('Пользователь с этим email не найден');
+    }
+
+    const tokenBytes = crypto.randomBytes(32);
+    const token = tokenBytes.toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const expiresAt = new Date();
+
+    expiresAt.setHours(expiresAt.getHours() + 1);
+    user.resetToken = tokenHash;
+    user.resetTokenAt = expiresAt;
+
+    await this.clientRepository.save(user);
+
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    return { resetLink };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await this.clientRepository.findOne({
+      where: {
+        resetToken: tokenHash,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Неверный токен восстановления');
+    }
+
+    if (!user.resetTokenAt || user.resetTokenAt < new Date()) {
+      user.resetToken = null;
+      user.resetTokenAt = null;
+      await this.clientRepository.save(user);
+
+      throw new UnauthorizedException('Токен восстановления истёк');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 5);
+
+    user.password = hashedPassword;
+    user.resetToken = null;
+    user.resetTokenAt = null;
+
+    await this.clientRepository.save(user);
+
+    return { success: true };
   }
 }

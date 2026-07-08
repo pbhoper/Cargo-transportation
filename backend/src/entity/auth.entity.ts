@@ -26,9 +26,15 @@ export class AuthEntity {
   @Column()
   lastName: string;
 
+  @Column({ name: 'reset_token', type: 'varchar', nullable: true })
+  resetToken: string | null;
+
+  @Column({ name: 'reset_token_at', type: 'timestamp', nullable: true })
+  resetTokenAt: Date | null;
+
   @OneToMany(() => WaybillEntity, (waybill) => waybill.user)
   waybills: WaybillEntity[];
 
-  @Column({type: "enum", enum: ['user', 'admin'], default: 'user'})
+  @Column({ type: 'enum', enum: ['user', 'admin'], default: 'user' })
   roles: 'user' | 'admin';
 }

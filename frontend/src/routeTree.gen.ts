@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaybillRouteImport } from './routes/waybill'
 import { Route as WarehouseRouteImport } from './routes/warehouse'
 import { Route as TthRouteImport } from './routes/tth'
+import { Route as ResetRouteImport } from './routes/reset'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const TthRoute = TthRouteImport.update({
   path: '/tth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetRoute = ResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/reports': typeof ReportsRoute
+  '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reports': typeof ReportsRoute
+  '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
@@ -59,21 +67,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/reports': typeof ReportsRoute
+  '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
+  fullPaths: '/' | '/reports' | '/reset' | '/tth' | '/warehouse' | '/waybill'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
-  id: '__root__' | '/' | '/reports' | '/tth' | '/warehouse' | '/waybill'
+  to: '/' | '/reports' | '/reset' | '/tth' | '/warehouse' | '/waybill'
+  id:
+    | '__root__'
+    | '/'
+    | '/reports'
+    | '/reset'
+    | '/tth'
+    | '/warehouse'
+    | '/waybill'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ReportsRoute: typeof ReportsRoute
+  ResetRoute: typeof ResetRoute
   TthRoute: typeof TthRoute
   WarehouseRoute: typeof WarehouseRoute
   WaybillRoute: typeof WaybillRoute
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset': {
+      id: '/reset'
+      path: '/reset'
+      fullPath: '/reset'
+      preLoaderRoute: typeof ResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
@@ -122,6 +146,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ReportsRoute: ReportsRoute,
+  ResetRoute: ResetRoute,
   TthRoute: TthRoute,
   WarehouseRoute: WarehouseRoute,
   WaybillRoute: WaybillRoute,

@@ -16,6 +16,15 @@ import { RegisterDto } from '../dto/register-dto';
 import { LoginDto } from '../dto/login-dto';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 
+class RequestPasswordResetDto {
+  email: string;
+}
+
+class ResetPasswordDto {
+  token: string;
+  newPassword: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -33,6 +42,16 @@ export class AuthController {
   @Get('users/search')
   searchUsers(@Query('search') search: string) {
     return this.authService.searchUsers(search);
+  }
+
+  @Post('request-password-reset')
+  requestPasswordReset(@Body() dto: RequestPasswordResetDto) {
+    return this.authService.requestPasswordReset(dto.email);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 
   @Patch('users/:id/role')

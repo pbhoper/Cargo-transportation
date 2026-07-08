@@ -1,8 +1,9 @@
 import { Button, Flex, Form, Input, message } from 'antd';
-import type { FC, JSX } from 'react';
+import React, { type FC, type JSX } from 'react';
 import type { FormProps } from 'antd';
 import type { LoginTypes } from '../types/login.interface.ts';
-import { useAuth} from "./authcontext.tsx";
+import { useAuth } from "./authcontext.tsx";
+import ForgotPasswordForm from "./forgot.password.form.tsx";
 
 interface Props {
   onSuccess: (token: string) => void;
@@ -10,8 +11,9 @@ interface Props {
 
 const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
   const { login } = useAuth();
+  const [showForgot, setShowForgot] = React.useState(false);
 
-  const API_URL = "http://localhost:3000/auth/login"
+  const API_URL = "http://localhost:3000/auth/login";
 
   const handleFinish: FormProps<LoginTypes>['onFinish'] = async (values) => {
     try {
@@ -46,6 +48,10 @@ const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
   const handleFinishFailed: FormProps<LoginTypes>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
+  if (showForgot) {
+    return <ForgotPasswordForm onBackToLogin={() => setShowForgot(false)} />;
+  }
 
   return (
     <Form
@@ -82,7 +88,8 @@ const LoginForm: FC<Props> = ({ onSuccess }): JSX.Element => {
       </Form.Item>
 
       <Form.Item label={null}>
-        <Flex justify="center" style={{ marginTop: '30px' }}>
+        <Flex justify="center" style={{ marginTop: '30px', gap: '10px' }}>
+          <Button onClick={() => setShowForgot(true)}>Забыли пароль?</Button>
           <Button type="primary" htmlType="submit">
             Submit
           </Button>
