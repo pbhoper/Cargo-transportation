@@ -37,4 +37,13 @@ export class AuthEntity {
 
   @Column({ type: 'enum', enum: ['user', 'admin'], default: 'user' })
   roles: 'user' | 'admin';
+
+  @Column({ default: false, name: 'is_verified' })
+  isVerified: boolean;
+
+  @Column({ name: 'verification_token', type: 'varchar', nullable: true })
+  verificationToken: string | null;
+
+  @Column({ name: 'verification_token_at', type: 'timestamp', nullable: true })
+  verificationTokenAt: Date | null;
 }

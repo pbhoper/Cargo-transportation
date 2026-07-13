@@ -39,6 +39,11 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Get('verify-email')
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
   @Get('users/search')
   searchUsers(@Query('search') search: string) {
     return this.authService.searchUsers(search);
@@ -61,15 +66,9 @@ export class AuthController {
     @Body('role') role: 'user' | 'admin',
     @Request() req,
   ) {
-    if (req.user.role !== 'admin') {
-      throw new ForbiddenException('Только админ может менять роли');
+    if (req.user.roles !== 'admin') {
+      throw new ForbiddenException('Только администраторы могут изменять роли');
     }
     return this.authService.changeUserRole(id, role);
-  }
-
-  @Get('me')
-  @UseGuards(JwtAuthGuard)
-  me(@Request() req) {
-    return req.user;
   }
 }

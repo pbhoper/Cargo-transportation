@@ -32,13 +32,29 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(authDto.password, 5);
 
+    const tokenBytes = crypto.randomBytes(32);
+    const token = tokenBytes.toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
     const user = this.clientRepository.create({
       ...authDto,
       password: hashedPassword,
       roles: 'user',
+      isVerified: false,
+      verificationToken: tokenHash,
+      verificationTokenAt: expiresAt,
     });
 
-    return this.clientRepository.save(user);
+    const savedUser = await this.clientRepository.save(user);
+
+    const verificationLink = `http://localhost/verify-email?token=${token}`;
+
+    console.log(verificationLink);
+
+    return savedUser;
   }
 
   async login(authDto: LoginDto) {
@@ -59,43 +75,56 @@ export class AuthService {
       throw new UnauthorizedException('Неверный пароль');
     }
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.roles,
-    };
-
-    return {
-      access_token: this.jwtService.sign(payload),
-      user,
-    };
+    return this.generateToken(user);
   }
 
-  async searchUsers(search?: string) {
-    const query = this.clientRepository.createQueryBuilder('user');
+  async verifyEmail(token: string) {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-    if (search && search.length >= 1) {
-      query.where(
-        'user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.username ILIKE :search',
-        { search: `%${search}%` },
-      );
-    }
-
-    query.take(10);
-
-    return query.getMany();
-  }
-
-  async changeUserRole(id: number, role: 'user' | 'admin') {
-    const user = await this.clientRepository.findOne({ where: { id } });
+    const user = await this.clientRepository.findOne({
+      where: {
+        verificationToken: tokenHash,
+      },
+    });
 
     if (!user) {
-      throw new NotFoundException('Пользователь не найден');
+      throw new UnauthorizedException('Неверный токен верификации');
     }
 
-    user.roles = role;
+    if (!user.verificationTokenAt || user.verificationTokenAt < new Date()) {
+      user.verificationToken = null;
+      user.verificationTokenAt = null;
+      await this.clientRepository.save(user);
 
-    return this.clientRepository.save(user);
+      throw new UnauthorizedException('Срок действия токена верификации истёк');
+    }
+
+    user.isVerified = true;
+    user.verificationToken = null;
+    user.verificationTokenAt = null;
+
+    await this.clientRepository.save(user);
+
+    return { success: true, message: 'Email успешно подтвержден' };
+  }
+
+  private async generateToken(user: AuthEntity) {
+    const payload = { username: user.username, id: user.id, roles: user.roles };
+    return {
+      token: this.jwtService.sign(payload),
+    };
+  }
+
+  async searchUsers(search: string) {
+    if (!search) {
+      return [];
+    }
+    return this.clientRepository
+      .createQueryBuilder('client')
+      .where('client.username LIKE :search', { search: `%${search}%` })
+      .orWhere('client.firstName LIKE :search', { search: `%${search}%` })
+      .orWhere('client.lastName LIKE :search', { search: `%${search}%` })
+      .getMany();
   }
 
   async requestPasswordReset(email: string) {
@@ -104,7 +133,6 @@ export class AuthService {
     });
 
     if (!user) {
-
       throw new NotFoundException('Пользователь с этим email не найден');
     }
 
@@ -151,8 +179,15 @@ export class AuthService {
     user.resetToken = null;
     user.resetTokenAt = null;
 
-    await this.clientRepository.save(user);
+    return this.clientRepository.save(user);
+  }
 
-    return { success: true };
+  async changeUserRole(id: number, role: 'user' | 'admin') {
+    const user = await this.clientRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+    user.roles = role;
+    return this.clientRepository.save(user);
   }
 }

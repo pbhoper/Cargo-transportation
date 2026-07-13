@@ -5,8 +5,8 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateTTHWaybillTable1783338752318 implements MigrationInterface {
-  name = 'CreateTTHWaybillTable1783338752318';
+export class CreateTthWaybill1783592248913 implements MigrationInterface {
+  name = 'CreateTthWaybill1783592248913';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(

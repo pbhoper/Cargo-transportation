@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaybillRouteImport } from './routes/waybill'
 import { Route as WarehouseRouteImport } from './routes/warehouse'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as TthRouteImport } from './routes/tth'
 import { Route as ResetRouteImport } from './routes/reset'
 import { Route as ReportsRouteImport } from './routes/reports'
@@ -24,6 +25,11 @@ const WaybillRoute = WaybillRouteImport.update({
 const WarehouseRoute = WarehouseRouteImport.update({
   id: '/warehouse',
   path: '/warehouse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TthRoute = TthRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof ReportsRoute
   '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/reports': typeof ReportsRoute
   '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
 }
@@ -69,20 +77,36 @@ export interface FileRoutesById {
   '/reports': typeof ReportsRoute
   '/reset': typeof ResetRoute
   '/tth': typeof TthRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/warehouse': typeof WarehouseRoute
   '/waybill': typeof WaybillRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reports' | '/reset' | '/tth' | '/warehouse' | '/waybill'
+  fullPaths:
+    | '/'
+    | '/reports'
+    | '/reset'
+    | '/tth'
+    | '/verify-email'
+    | '/warehouse'
+    | '/waybill'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reports' | '/reset' | '/tth' | '/warehouse' | '/waybill'
+  to:
+    | '/'
+    | '/reports'
+    | '/reset'
+    | '/tth'
+    | '/verify-email'
+    | '/warehouse'
+    | '/waybill'
   id:
     | '__root__'
     | '/'
     | '/reports'
     | '/reset'
     | '/tth'
+    | '/verify-email'
     | '/warehouse'
     | '/waybill'
   fileRoutesById: FileRoutesById
@@ -92,6 +116,7 @@ export interface RootRouteChildren {
   ReportsRoute: typeof ReportsRoute
   ResetRoute: typeof ResetRoute
   TthRoute: typeof TthRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   WarehouseRoute: typeof WarehouseRoute
   WaybillRoute: typeof WaybillRoute
 }
@@ -110,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/warehouse'
       fullPath: '/warehouse'
       preLoaderRoute: typeof WarehouseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tth': {
@@ -148,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsRoute: ReportsRoute,
   ResetRoute: ResetRoute,
   TthRoute: TthRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   WarehouseRoute: WarehouseRoute,
   WaybillRoute: WaybillRoute,
 }
