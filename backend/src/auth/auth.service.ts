@@ -82,9 +82,7 @@ export class AuthService {
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
     const user = await this.clientRepository.findOne({
-      where: {
-        verificationToken: tokenHash,
-      },
+      where: { verificationToken: tokenHash },
     });
 
     if (!user) {
@@ -95,7 +93,6 @@ export class AuthService {
       user.verificationToken = null;
       user.verificationTokenAt = null;
       await this.clientRepository.save(user);
-
       throw new UnauthorizedException('Срок действия токена верификации истёк');
     }
 
@@ -103,13 +100,23 @@ export class AuthService {
     user.verificationToken = null;
     user.verificationTokenAt = null;
 
-    await this.clientRepository.save(user);
+    const savedUser = await this.clientRepository.save(user);
+    const { token: newJwtToken } = await this.generateToken(savedUser);
 
-    return { success: true, message: 'Email успешно подтвержден' };
+    return {
+      success: true,
+      message: 'Email успешно подтвержден',
+      token: newJwtToken,
+    };
   }
 
   private async generateToken(user: AuthEntity) {
-    const payload = { username: user.username, id: user.id, roles: user.roles };
+    const payload = {
+      username: user.username,
+      id: user.id,
+      roles: user.roles,
+      isVerified: user.isVerified,
+    };
     return {
       token: this.jwtService.sign(payload),
     };

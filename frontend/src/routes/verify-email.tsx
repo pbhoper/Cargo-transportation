@@ -28,10 +28,14 @@ function VerifyEmailComponent() { //eslint-disable-line
       return;
     }
 
-    axios.get(`http://localhost:3000/auth/verify?token=${token}`)
+    axios.get(`http://localhost:3000/auth/verify-email?token=${token}`)
       .then((res) => {
         setStatus('success');
         setMessage(res.data.message || 'Успешно!');
+
+        if (res.data.token) {
+          localStorage.setItem('token', res.data.token);
+        }
       })
       .catch((err) => {
         setStatus('error');
