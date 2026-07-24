@@ -75,11 +75,7 @@ export class ReportService {
 
     await this.saveReportQuery(query, userId);
 
-    const ttns = await this.tthRepository.find({
-      where: {
-        userId,
-      },
-    });
+    const ttns = await this.tthRepository.find({where: {userId,},});
 
     const workbook = this.createWorkbook();
     const sheet = workbook.addWorksheet('waybills');

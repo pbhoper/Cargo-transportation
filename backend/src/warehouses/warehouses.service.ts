@@ -1,24 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 import { WarehousesEntity } from '../entity/warehouses.entity';
 import { WarehouseDto } from '../dto/warehouses-dto';
 
 interface PaginationQuery {
   page: number;
   limit: number;
-}
-
-interface PaginatedResult {
-  data: WarehousesEntity[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
 }
 
 @Injectable()

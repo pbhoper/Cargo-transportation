@@ -31,7 +31,6 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(authDto.password, 5);
-
     const tokenBytes = crypto.randomBytes(32);
     const token = tokenBytes.toString('hex');
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');

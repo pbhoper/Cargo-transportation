@@ -14,7 +14,6 @@ import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { WarehouseDto } from '../dto/warehouses-dto';
 import { WarehousesService } from './warehouses.service';

@@ -3,9 +3,7 @@ import { EmailService } from './email.service';
 
 export interface SendCongratsDto {
   email: string;
-
   name: string;
-
   event: string;
 }
 

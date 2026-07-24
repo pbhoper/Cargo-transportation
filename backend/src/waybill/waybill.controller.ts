@@ -37,11 +37,7 @@ export class WaybillController {
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: WaybillUpdatedDto,
-    @Request() req,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: WaybillUpdatedDto, @Request() req,) {
     return this.service.update(id, dto, req);
   }
 
