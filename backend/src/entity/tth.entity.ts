@@ -1,4 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+} from 'typeorm';
 import { TthEnum } from '../enum/tth.enum';
 import { TthItemDto } from '../dto/tth.item-dto';
 import { WaybillEntity } from './waybill.entity';

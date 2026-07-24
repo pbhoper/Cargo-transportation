@@ -1,4 +1,11 @@
-import {Button, Flex, Form, type FormProps, Input, notification} from "antd";
+import {
+  Button,
+  Flex,
+  Form,
+  type FormProps,
+  Input,
+  notification,
+} from "antd";
 import type {FC, JSX} from "react";
 import type {RegisterTypes} from "../types/register.interface.ts";
 import axios, { AxiosError } from "axios";

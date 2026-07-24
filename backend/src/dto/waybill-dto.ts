@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsArray, IsNumber, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsArray,
+  IsNumber,
+  Min,
+} from 'class-validator';
 
 export class WaybillDto {
   @IsString()

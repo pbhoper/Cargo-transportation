@@ -31,10 +31,7 @@ export class GoodsController {
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateGoodsDto: Partial<GoodsDto>,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateGoodsDto: Partial<GoodsDto>,) {
     return this.goodsService.update(id, updateGoodsDto);
   }
 

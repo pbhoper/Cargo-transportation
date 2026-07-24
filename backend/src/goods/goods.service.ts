@@ -11,18 +11,14 @@ export class GoodsService {
     private goodsRepository: Repository<GoodsEntity>,
   ) {}
 
-
   async create(createGoodsDto: GoodsDto): Promise<GoodsEntity> {
     const good = this.goodsRepository.create(createGoodsDto);
     return this.goodsRepository.save(good);
   }
 
-
   async findAll(): Promise<GoodsEntity[]> {
     return this.goodsRepository.find({ order: { id: 'DESC' } });
   }
-
-
 
   async findOne(id: number): Promise<GoodsEntity> {
     const good = await this.goodsRepository.findOne({ where: { id } });
@@ -30,16 +26,17 @@ export class GoodsService {
     return good;
   }
 
-
-
   async update(
     id: number,
     updateGoodsDto: Partial<GoodsDto>,
   ): Promise<GoodsEntity> {
+
     const goods = await this.findOne(id);
+
     if (!goods) {
       throw new NotFoundException(`товар с N${id} не найден`);
     }
+
     return this.goodsRepository.save(
       this.goodsRepository.merge(goods, updateGoodsDto),
     );
@@ -48,8 +45,11 @@ export class GoodsService {
 
   async remove(id: number): Promise<void> {
     const good = await this.findOne(id);
+
     if (!good) {
+
       throw new NotFoundException(`Не удалось найти ${id} для удаления`)
+
     }
     await this.goodsRepository.remove(good);
   }

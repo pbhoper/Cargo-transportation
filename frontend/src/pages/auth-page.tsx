@@ -1,4 +1,7 @@
-import {Modal, Segmented} from "antd";
+import {
+  Modal,
+  Segmented,
+} from "antd";
 import LoginForm from "../forms/login.form.tsx";
 import RegisterForm from "../forms/register.form.tsx";
 import type {FC} from "react";

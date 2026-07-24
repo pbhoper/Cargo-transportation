@@ -1,4 +1,10 @@
-import { IsNumber, IsString, IsOptional, IsDate, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  IsOptional,
+  IsDate,
+  Min,
+} from 'class-validator';
 
 export class UpdateWriteOffDto {
   @IsOptional()
